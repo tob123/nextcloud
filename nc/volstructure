@@ -1,0 +1,7 @@
+
+    /var/www/html Main folder, needed for updating
+    /var/www/html/custom_apps installed / modified apps
+    /var/www/html/config local configuration
+    /var/www/html/data the actual data of your Nextcloud
+    /var/www/html/themes/<YOU_CUSTOM_THEME> theming/branding
+

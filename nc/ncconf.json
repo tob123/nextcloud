@@ -1,0 +1,13 @@
+{"system": {"apps_paths":
+    [
+        {
+            "path": "\/nextcloud\/apps",
+            "url": "\/apps",
+            "writable": false
+        },
+        {
+            "path": "\/nextcloud\/other_apps\/apps2",
+            "url": "\/apps2",
+            "writable": true       }
+    ]
+}}

@@ -155,7 +155,7 @@ ENV DOMAIN=localhost \
     CRON_TYPE=WEB \
     SITE_URL=""
     
-LABEL description="bla" \
+LABEL description="Nextcloud Docker container without root gosu or sudo" \
       nextcloud="Nextcloud v${NC_VER}" \
       maintainer="Appelo Solutions <tob@nice.eu>"
 ENTRYPOINT ["php-entry.sh"]

@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  sut:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.12.0.7
+    networks:
+      front:
+      back:
+    user: webadm
+    environment:
+      - DB_TYPE=mysql
+      - DB_NAME=nextcloud
+      - DB_HOST=sut-db
+      - DB_USER=nextcloud
+      - DB_PASS=nextcloud
+      - NC_ADMIN=admin1234
+      - NC_PASS=test
+    depends_on: 
+      - sut-db
+  sut-db:
+    image: mariadb
+    networks:
+      back:
+    environment:
+      - MYSQL_ROOT_PASSWORD=averycomplicatedpasswordthatseemsuselesstoenterhere
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloud
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 40s
+      retries: 10
+networks:
+  front:
+  back:
+    internal: true

@@ -67,7 +67,7 @@ RUN set -ex; \
     \
     apk add php7-apache2
 # download nextcloud stuff
-ARG NC_VER=12.0.7
+ARG NC_VER=13.0.4
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
 ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module
@@ -153,8 +153,11 @@ ENV DOMAIN=localhost \
     DB_TYPE=sqlite3 \
     DB_HOST=localhost \
     CRON_TYPE=WEB \
-    SITE_URL=""
-    
+    SITE_URL="" \
+    NC_ADMIN="" \
+    NC_PASS="" \
+    DB_USER="" \
+    DB_PASS=""
 LABEL description="Nextcloud Docker container without root gosu or sudo" \
       nextcloud="Nextcloud v${NC_VER}" \
       maintainer="Appelo Solutions <tob@nice.eu>"

@@ -153,8 +153,11 @@ ENV DOMAIN=localhost \
     DB_TYPE=sqlite3 \
     DB_HOST=localhost \
     CRON_TYPE=WEB \
-    SITE_URL=""
-    
+    SITE_URL="" \
+    NC_ADMIN="" \
+    NC_PASS="" \
+    DB_USER="" \
+    DB_PASS=""
 LABEL description="Nextcloud Docker container without root gosu or sudo" \
       nextcloud="Nextcloud v${NC_VER}" \
       maintainer="Appelo Solutions <tob@nice.eu>"

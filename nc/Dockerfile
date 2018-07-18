@@ -65,7 +65,8 @@ RUN set -ex; \
 # arrange webserver
 RUN set -ex; \
     \
-    apk add php7-apache2
+    apk add php7-apache2 ; \
+    apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
 # download nextcloud stuff
 ARG NC_VER=13.0.4
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
@@ -138,7 +139,9 @@ COPY php-entry.sh occ ncconf.json /usr/local/bin/
 COPY ncup /home/webadm/ncup/
 RUN chown -R webadm /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini \
     /usr/local/bin/occ /home/webadm; \
-    chmod +x /usr/local/bin/occ /usr/local/bin/php-entry.sh
+    chmod +x /usr/local/bin/occ /usr/local/bin/php-entry.sh; \
+    chmod -R g-s /home/webadm /var/log/apache2 /var/www/localhost/htdocs; \
+    chmod -R u-s /usr/sbin/suexec
 #sed -i 's/logs\/error.log/\/tmp\/logpipe/' /etc/apache2/httpd.conf ; \
 #sed -i 's/logs\/access.log/\/tmp\/logpipe/' /etc/apache2/httpd.conf
 # sooome hacks to get stdout logging working combined with su-exec
@@ -157,7 +160,8 @@ ENV DOMAIN=localhost \
     NC_ADMIN="" \
     NC_PASS="" \
     DB_USER="" \
-    DB_PASS=""
+    DB_PASS="" \
+    LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 LABEL description="Nextcloud Docker container without root gosu or sudo" \
       nextcloud="Nextcloud v${NC_VER}" \
       maintainer="Appelo Solutions <tob@nice.eu>"

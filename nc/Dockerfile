@@ -135,7 +135,7 @@ RUN set -ex; \
     mkdir /home/webadm/ncup
 COPY index.php /var/www/localhost/htdocs/
 COPY nc_opccache.ini nc_apcu.ini /etc/php7/conf.d/
-COPY php-entry.sh occ ncconf.json /usr/local/bin/
+COPY checkcontainer.sh php-entry.sh occ ncconf.json /usr/local/bin/
 COPY ncup /home/webadm/ncup/
 RUN chown -R webadm /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini \
     /usr/local/bin/occ /home/webadm; \
@@ -167,3 +167,5 @@ LABEL description="Nextcloud Docker container without root gosu or sudo" \
       maintainer="Appelo Solutions <tob@nice.eu>"
 ENTRYPOINT ["php-entry.sh"]
 CMD ["httpd", "-DFOREGROUND"]
+HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh
+    

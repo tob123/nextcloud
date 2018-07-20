@@ -137,22 +137,53 @@ RUN set -ex; \
     mkdir /home/webadm/ncup
 COPY index.php /var/www/localhost/htdocs/
 COPY nc_opccache.ini nc_apcu.ini /etc/php7/conf.d/
-COPY checkcontainer.sh php-entry.sh occ ncconf.json /usr/local/bin/
+COPY checkcontainer.sh ncinstall.sh php-entry.sh occ ncconf.json /usr/local/bin/
 COPY ncup /home/webadm/ncup/
-RUN chown -R webadm /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini \
+COPY limitexcept /root/
+RUN set -ex; \
+    \
+    chown -R webadm /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini \
     /usr/local/bin/occ /home/webadm; \
     chmod +x /usr/local/bin/occ /usr/local/bin/php-entry.sh; \
     chmod -R g-s /home/webadm /var/log/apache2 /var/www/localhost/htdocs; \
-    chmod -R u-s /usr/sbin/suexec
+    chmod -R u-s /usr/sbin/suexec; \
 #sed -i 's/logs\/error.log/\/tmp\/logpipe/' /etc/apache2/httpd.conf ; \
 #sed -i 's/logs\/access.log/\/tmp\/logpipe/' /etc/apache2/httpd.conf
 # sooome hacks to get stdout logging working combined with su-exec
+#CIS stuff for apache
+#apply some cis baseline items for apache. nextcloud does not need most auth related modules:
+    APACHECONF=/etc/apache2/httpd.conf; \
+    sed -i 's/^LoadModule auth_basic_module/#LoadModule auth_basic_module/' ${APACHECONF}; \
+    sed -i 's/^LoadModule authn_file_module/#LoadModule authn_file_module/' ${APACHECONF}; \
+    sed -i 's/^LoadModule authz_user_module/#LoadModule authz_user_module/' ${APACHECONF}; \
+    sed -i 's/^LoadModule authz_groupfile_module/#LoadModule authz_groupfile_module/' ${APACHECONF}; \
+#deactivate status
+    sed -i 's/^LoadModule status_module/#LoadModule status_module/' ${APACHECONF}; \
+#deactivate autoindex
+    sed -i 's/^LoadModule autoindex_module/#LoadModule autoindex_module/' ${APACHECONF}; \
+#drop some config files related to modules not needed:
+    rm /etc/apache2/conf.d/userdir.conf; \
+    rm /etc/apache2/conf.d/info.conf; \
+#set options to none for default directories as recommended in 1.5
+    sed -i 's/^    Options .*/    Options None/' ${APACHECONF}; \
+#1.5.6 removal of test-cgi
+    rm /var/www/localhost/cgi-bin/test-cgi; \
+#1.5.7: set limit to valid http requests
+    sed -i '/\<Directory /r /root/limitexcept' ${APACHECONF}; \
+    rm /root/limitexcept; \
+#1.6
+    sed -i 's/^LogLevel.*/LogLevel notice core:info/' ${APACHECONF}; \
+#1.7 ssl is done elsewhere
+#1.8
+    sed -i 's/^ServerTokens.*/ServerTokens Prod/' ${APACHECONF}; \
+    sed -i 's/^ServerSignature.*/ServerSignature Off/' ${APACHECONF}; \
+    sed -i 's/^Timeout.*/Timeout 10/' /etc/apache2/conf.d/default.conf
 USER webadm
 RUN  chmod 770 /nextcloud/config; \
      mkdir /nextcloud/other_apps; \
      chmod 770 /nextcloud/other_apps
 VOLUME /nc/data /nc/config /nc/apps2
-COPY httpd-nc.conf /etc/apache2/conf.d/
+COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
 EXPOSE $HTTP_PORT
 ENV DOMAIN=localhost \
     DB_TYPE=sqlite3 \

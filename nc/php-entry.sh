@@ -39,7 +39,7 @@ mysql_status="notok"
 counter=0
 set +e
 while [ $mysql_status = "notok" ] && [ $counter -le 30 ]; do
-  php /nextcloud/occ maintenance:install --database ${DB_TYPE} --database-name ${DB_NAME} --database-host ${DB_HOST} --database-user ${DB_USER} --database-pass ${DB_PASS} --admin-user ${NC_ADMIN} --admin-pass {NC_PASS} --data-dir=/nc/data
+  /usr/local/bin/ncinstall.sh
   if [ $? -ne 0 ]; then
     sleep 1
     counter=$(( $counter + 1 ))

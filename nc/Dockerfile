@@ -61,7 +61,9 @@ RUN set -ex; \
     libsmbclient \
 #others
 # php itself
-    php7
+    php7 \
+# health monitor needs curl
+    curl
 # arrange webserver
 RUN set -ex; \
     \
@@ -157,10 +159,11 @@ ENV DOMAIN=localhost \
     DB_HOST=localhost \
     CRON_TYPE=WEB \
     SITE_URL="" \
-    NC_ADMIN="" \
+    NC_ADMIN="admin" \
     NC_PASS="" \
-    DB_USER="" \
+    DB_USER="nextcloud" \
     DB_PASS="" \
+    DB_NAME="nextcloud" \
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh
 LABEL description="Nextcloud Docker container without root gosu or sudo" \

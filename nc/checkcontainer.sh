@@ -1,2 +1,2 @@
 #!/bin/sh
-curl -sL http://localhost:8888/ | grep login >/dev/null 2>&1
+curl -sL http://localhost:8000/ | grep login >/dev/null 2>&1

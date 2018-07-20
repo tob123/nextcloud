@@ -162,10 +162,10 @@ ENV DOMAIN=localhost \
     DB_USER="" \
     DB_PASS="" \
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
+HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh
 LABEL description="Nextcloud Docker container without root gosu or sudo" \
       nextcloud="Nextcloud v${NC_VER}" \
       maintainer="Appelo Solutions <tob@nice.eu>"
 ENTRYPOINT ["php-entry.sh"]
 CMD ["httpd", "-DFOREGROUND"]
-HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh
     

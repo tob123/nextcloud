@@ -1,13 +1,7 @@
 FROM alpine:3.7
 # we need php 7.1 because nextcloud has a dependency on mcrypt for php saml
-
-# entrypoint.sh and cron.sh dependencies
 # install the PHP extensions we need
 # see https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html
-# questions / remarkds:
-# do we need php itself ?
-# arrange updating of packages (and clean cache afterwards)
-# remove useless --no-cache parameter since this is the default anyway
 ###
 ENV HTTP_PORT=8000 \
     UPLOAD_MAX_SIZE=10G \
@@ -96,6 +90,7 @@ RUN set -ex; \
     zlib-dev \
     git ;\
     update-ca-certificates ; \
+    #get nextcloud and check signatures
     cd /tmp ; \
     curl -O ${NC_URL}${NC_VER}.tar.bz2.sha256 ; \
     curl -O ${NC_URL}${NC_VER}.tar.bz2.asc ; \
@@ -105,7 +100,6 @@ RUN set -ex; \
     sha256sum -c nextcloud-${NC_VER}.tar.bz2.sha256 < nextcloud-${NC_VER}.tar.bz2.sha256 ;\
     curl -O https://nextcloud.com/nextcloud.asc ;\
     gpg --import nextcloud.asc ;\
-#    gpg -q --verify nextcloud-${NC_VER}.tar.bz2.asc nextcloud-${NC_VER}.tar.bz2 ;\
     FINGERPRINT="$(LANG=C gpg --verify nextcloud-${NC_VER}.tar.bz2.asc nextcloud-${NC_VER}.tar.bz2 2>&1 \
     | sed -n "s#Primary key fingerprint: \(.*\)#\1#p" | sed 's/  / /')";\
     if [ "${FINGERPRINT}" != "${GPG_nextcloud}" ]; then echo "Warning! Wrong GPG fingerprint!" && exit 1; fi ;\
@@ -129,6 +123,7 @@ RUN set -ex; \
     sed -i 's/logs\/access.log/\/proc\/self\/fd\/1/' /etc/apache2/httpd.conf; \
     mkdir /run/apache2; \
     chown apache:apache /run/apache2; \
+    chmod 700 /run/apache2
     mkdir -p /nc/data /nc/config /nc/apps2 /nc/themes; \
     tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
     chown -R webadm:apache /nc ; \
@@ -146,6 +141,7 @@ RUN set -ex; \
     chown -R webadm /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini \
     /usr/local/bin/occ /home/webadm; \
     chmod +x /usr/local/bin/occ /usr/local/bin/php-entry.sh; \
+    #get suid and gid files out of the way.
     chmod -R g-s /home/webadm /var/log/apache2 /var/www/localhost/htdocs; \
     chmod -R u-s /usr/sbin/suexec; \
 #sed -i 's/logs\/error.log/\/tmp\/logpipe/' /etc/apache2/httpd.conf ; \
@@ -172,9 +168,9 @@ RUN set -ex; \
 #1.5.7: set limit to valid http requests
     sed -i '/\<Directory /r /root/limitexcept' ${APACHECONF}; \
     rm /root/limitexcept; \
-#1.6
+#1.6 increase logging verbosity
     sed -i 's/^LogLevel.*/LogLevel notice core:info/' ${APACHECONF}; \
-#1.7 ssl is done elsewhere
+#1.7 ssl is done elsewhere (not in this container)
 #1.8
     sed -i 's/^ServerTokens.*/ServerTokens Prod/' ${APACHECONF}; \
     sed -i 's/^ServerSignature.*/ServerSignature Off/' ${APACHECONF}; \
@@ -198,7 +194,7 @@ ENV DOMAIN=localhost \
     DB_NAME="nextcloud" \
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh
-LABEL description="Nextcloud Docker container without root gosu or sudo" \
+LABEL description="Nextcloud Docker container without root gosu sudo or other wrappers that use root" \
       nextcloud="Nextcloud v${NC_VER}" \
       maintainer="Appelo Solutions <tob@nice.eu>"
 ENTRYPOINT ["php-entry.sh"]

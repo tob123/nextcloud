@@ -63,6 +63,8 @@ RUN set -ex; \
 RUN set -ex; \
     \
     apk add php7-apache2 ; \
+    #iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
+    # the version from edge is ok though.
     apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
 # download nextcloud stuff
 ARG NC_VER=13.0.4
@@ -192,6 +194,7 @@ ENV DOMAIN=localhost \
     DB_USER="nextcloud" \
     DB_PASS="" \
     DB_NAME="nextcloud" \
+    #another step to get iconv working
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh
 LABEL description="Nextcloud Docker container without root gosu sudo or other wrappers that use root" \

@@ -51,6 +51,7 @@ RUN set -ex; \
     php7-exif \
     php7-gmp \
     php7-imagick \
+    imagemagick \
 # caching stuff
     php7-opcache \
     php7-redis \

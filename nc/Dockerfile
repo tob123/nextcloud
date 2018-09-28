@@ -126,7 +126,7 @@ RUN set -ex; \
     mkdir /run/apache2; \
     chown apache:apache /run/apache2; \
     chmod 700 /run/apache2; \
-    mkdir -p /nc/data /nc/config /nc/apps2 /nc/themes; \
+    mkdir -p /nc/data /nc/config /nc/themes; \
     tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
     chown -R webadm:apache /nc ; \
     chown -R webadm:apache /nextcloud ; \
@@ -181,7 +181,7 @@ USER webadm
 RUN  chmod 770 /nextcloud/config; \
      mkdir /nextcloud/other_apps; \
      chmod 770 /nextcloud/other_apps
-VOLUME /nc/data /nc/config /nc/apps2
+VOLUME /nc/data /nc/config /nextcloud/other_apps
 COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
 EXPOSE $HTTP_PORT
 ENV DOMAIN=localhost \

@@ -9,7 +9,6 @@ fi
 
 prep_env () {
 ln -sf /nc/config/config.php /nextcloud/config/config.php
-ln -sf /nc/apps2 /nextcloud/other_apps/
 }
 
 are_we_upgraded () {
@@ -97,5 +96,4 @@ fi
 am_i_webadm
 umask 0007
 ln -sf /nc/config/config.php /nextcloud/config/config.php
-ln -sf /nc/apps2 /nextcloud/other_apps/
 exec "$@"

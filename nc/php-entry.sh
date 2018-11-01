@@ -1,22 +1,23 @@
 #!/bin/sh
 set -ex
 are_we_installed () {
-if [ -f /nc/config/config.php ]; then
+if [ -f /nextcloud/config/config.php ]; then
   echo "config file already exists. "
   nc_installed="yes"
 fi
 }
 
 prep_env () {
-ln -sf /nc/config/config.php /nextcloud/config/config.php
-ln -sf /nc/apps2 /nextcloud/other_apps/
+#ln -sf /nc/config/config.php /nextcloud/config/config.php
+#ln -sf /nc/apps2 /nextcloud/other_apps/
+echo ""
 }
 
 are_we_upgraded () {
 # timeout check for db ?
 #if nc -z -w 30 nexttest-db 3306 etc.
-if [ ! -L /nextcloud/config/config.php ]; then
-  prep_env
+#if [ ! -L /nextcloud/config/config.php ]; then
+#  prep_env
   mysql_status="notok"
   counter=0
   set +e
@@ -29,12 +30,12 @@ if [ ! -L /nextcloud/config/config.php ]; then
     fi
   done
 set -e
-fi
+#fi
 }
 
 install_nc () {
 umask 0007
-prep_env
+#prep_env
 mysql_status="notok"
 counter=0
 set +e
@@ -74,7 +75,8 @@ if [ $(whoami) = webadm ]; then
   if [ $nc_installed = "no" ]; then
     umask 0007
     install_nc
-    chmod 660 /nc/config/config.php
+#    chmod 660 /nc/config/config.php
+    chmod 660 /nextcloud/config/config.php
     tunables
     exit 0
   fi
@@ -87,7 +89,8 @@ if [ $(whoami) = webadm ]; then
       occ config:system:set htaccess.RewriteBase --value="/"
       occ maintenance:update:htaccess
     fi
-    chmod 660 /nc/config/config.php
+#    chmod 660 /nc/config/config.php
+    chmod 660 /nextcloud/config/config.php
     exit 0
   fi
 fi
@@ -96,6 +99,6 @@ fi
 # define some conditions on whether we are installed or not
 am_i_webadm
 umask 0007
-ln -sf /nc/config/config.php /nextcloud/config/config.php
-ln -sf /nc/apps2 /nextcloud/other_apps/
+#ln -sf /nc/config/config.php /nextcloud/config/config.php
+#ln -sf /nc/apps2 /nextcloud/other_apps/
 exec "$@"

@@ -6,7 +6,7 @@
             "writable": false
         },
         {
-            "path": "\/nextcloud\/other_apps\/apps2",
+            "path": "\/nextcloud\/apps2",
             "url": "\/apps2",
             "writable": true       }
     ]

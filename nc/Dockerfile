@@ -125,7 +125,7 @@ RUN set -ex; \
     sed -i 's/logs\/access.log/\/proc\/self\/fd\/1/' /etc/apache2/httpd.conf; \
     mkdir /run/apache2; \
     chown apache:apache /run/apache2; \
-    chmod 700 /run/apache2
+    chmod 700 /run/apache2; \
     mkdir -p /nc/data /nc/config /nc/apps2 /nc/themes; \
     tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
     chown -R webadm:apache /nc ; \
@@ -179,9 +179,9 @@ RUN set -ex; \
     sed -i 's/^Timeout.*/Timeout 10/' /etc/apache2/conf.d/default.conf
 USER webadm
 RUN  chmod 770 /nextcloud/config; \
-     mkdir /nextcloud/other_apps; \
-     chmod 770 /nextcloud/other_apps
-VOLUME /nc/data /nc/config /nc/apps2
+     mkdir /nextcloud/apps2; \
+     chmod 770 /nextcloud/apps2
+VOLUME /nc/data /nextcloud/config /nextcloud/apps2
 COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
 EXPOSE $HTTP_PORT
 ENV DOMAIN=localhost \

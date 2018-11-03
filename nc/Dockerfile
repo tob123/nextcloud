@@ -67,7 +67,7 @@ RUN set -ex; \
     # the version from edge is ok though.
     apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
 # download nextcloud stuff
-ARG NC_VER=13.0.5
+ARG NC_VER=14.0.3
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
 ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module
@@ -125,7 +125,7 @@ RUN set -ex; \
     sed -i 's/logs\/access.log/\/proc\/self\/fd\/1/' /etc/apache2/httpd.conf; \
     mkdir /run/apache2; \
     chown apache:apache /run/apache2; \
-    chmod 700 /run/apache2
+    chmod 700 /run/apache2; \
     mkdir -p /nc/data /nc/config /nc/apps2 /nc/themes; \
     tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
     chown -R webadm:apache /nc ; \
@@ -176,7 +176,12 @@ RUN set -ex; \
 #1.8
     sed -i 's/^ServerTokens.*/ServerTokens Prod/' ${APACHECONF}; \
     sed -i 's/^ServerSignature.*/ServerSignature Off/' ${APACHECONF}; \
-    sed -i 's/^Timeout.*/Timeout 10/' /etc/apache2/conf.d/default.conf
+    sed -i 's/^Timeout.*/Timeout 10/' /etc/apache2/conf.d/default.conf; \
+# some php items
+PHPCONF=/etc/php7/php.ini; \
+#hide php version from headers:
+sed -i 's/expose_php = On/expose_php = Off/' $PHPCONF
+
 USER webadm
 RUN  chmod 770 /nextcloud/config; \
      mkdir /nextcloud/apps2; \

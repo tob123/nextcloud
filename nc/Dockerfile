@@ -9,10 +9,12 @@ ENV HTTP_PORT=8000 \
     OPCACHE_MEM_SIZE=128 \
     MEMORY_LIMIT=512M \
     TZ=Etc/UTC
+ARG NC_VER=14.0.3
+ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
+ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 RUN set -ex; \
     \
-    apk update && apk upgrade ; \
-    apk add \
+    apk update && apk upgrade && apk add \
 # required packages
     php7-ctype \
     php7-dom \
@@ -58,18 +60,13 @@ RUN set -ex; \
 # php itself
     php7 \
 # health monitor needs curl
-    curl
-# arrange webserver
-RUN set -ex; \
-    \
-    apk add php7-apache2 ; \
-    #iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
-    # the version from edge is ok though.
-    apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
+    curl \
+# webserver and php
+    php7-apache2 \
+#iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
+# the version from edge is ok though.
+    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
 # download nextcloud stuff
-ARG NC_VER=14.0.3
-ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
-ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module
 RUN set -ex; \
     \

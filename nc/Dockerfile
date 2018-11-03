@@ -65,11 +65,9 @@ RUN set -ex; \
     php7-apache2 \
 #iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
 # the version from edge is ok though.
-    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
+    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv && \
 # download nextcloud stuff
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module
-RUN set -ex; \
-    \
     apk add --virtual build-dependencies \
     # this is for downloading
     ca-certificates \
@@ -113,9 +111,7 @@ RUN set -ex; \
 # so could be cleaner via  multistage build here and use copy from...
     echo "extension="smbclient.so"" > /etc/php7/conf.d/00_smbclient.ini ;\
     apk del --purge build-dependencies ;\
-    rm -rf /tmp/smbclient /tmp/nextcloud.asc /tmp/nextcloud-${NC_VER}.tar.bz2.sha256 /tmp/nextcloud-${NC_VER}.tar.bz2.asc /tmp/${NC_VER}.tar.bz2.md5 /root/.gnupg
-RUN set -ex; \
-    \
+    rm -rf /tmp/smbclient /tmp/nextcloud.asc /tmp/nextcloud-${NC_VER}.tar.bz2.sha256 /tmp/nextcloud-${NC_VER}.tar.bz2.asc /tmp/${NC_VER}.tar.bz2.md5 /root/.gnupg ;\
     adduser -D -G apache -g 'website administrator' -s /sbin/nologin webadm ; \
     sed -i "s/80/${HTTP_PORT}/g" /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/error.log/\/proc\/self\/fd\/2/' /etc/apache2/httpd.conf ; \

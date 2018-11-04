@@ -8,7 +8,8 @@ ENV HTTP_PORT=8000 \
     APC_SHM_SIZE=128M \
     OPCACHE_MEM_SIZE=128 \
     MEMORY_LIMIT=512M \
-    TZ=Etc/UTC
+    TZ=Etc/UTC \
+    WEBADM_UID=3000
 ARG NC_VER=12.0.9
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
 ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
@@ -112,7 +113,7 @@ RUN set -ex; \
     echo "extension="smbclient.so"" > /etc/php7/conf.d/00_smbclient.ini ;\
     apk del --purge build-dependencies ;\
     rm -rf /tmp/smbclient /tmp/nextcloud.asc /tmp/nextcloud-${NC_VER}.tar.bz2.sha256 /tmp/nextcloud-${NC_VER}.tar.bz2.asc /tmp/${NC_VER}.tar.bz2.md5 /root/.gnupg ;\
-    adduser -D -G apache -g 'website administrator' -s /sbin/nologin webadm ; \
+    adduser -u $WEBADM_UID -D -G apache -g 'website administrator' -s /sbin/nologin webadm ; \
     sed -i "s/80/${HTTP_PORT}/g" /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/error.log/\/proc\/self\/fd\/2/' /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/access.log/\/proc\/self\/fd\/1/' /etc/apache2/httpd.conf; \
@@ -130,12 +131,13 @@ COPY index.php /var/www/localhost/htdocs/
 COPY nc_opccache.ini nc_apcu.ini /etc/php7/conf.d/
 COPY checkcontainer.sh ncinstall.sh php-entry.sh occ ncconf.json /usr/local/bin/
 COPY ncup /home/webadm/ncup/
+COPY dbcheck.php dbcheckenv.php /home/webadm/
 COPY limitexcept /root/
 RUN set -ex; \
     \
     chown -R webadm /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini \
     /usr/local/bin/occ /home/webadm; \
-    chmod +x /usr/local/bin/occ /usr/local/bin/php-entry.sh; \
+    chmod +x /usr/local/bin/occ /usr/local/bin/php-entry.sh /home/webadm/ncup/ncup; \
     #get suid and gid files out of the way.
     chmod -R g-s /home/webadm /var/log/apache2 /var/www/localhost/htdocs; \
     chmod -R u-s /usr/sbin/suexec; \
@@ -179,7 +181,7 @@ USER webadm
 RUN  chmod 770 /nextcloud/config; \
      mkdir /nextcloud/apps2; \
      chmod 770 /nextcloud/apps2
-VOLUME /nc/data /nc/config /nextcloud/apps2
+VOLUME /nc/data /nextcloud/config /nextcloud/apps2
 COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
 EXPOSE $HTTP_PORT
 ENV DOMAIN=localhost \

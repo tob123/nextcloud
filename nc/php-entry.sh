@@ -8,36 +8,36 @@ fi
 }
 
 are_we_upgraded () {
-# timeout check for db ?
-#if nc -z -w 30 nexttest-db 3306 etc.
-  mysql_status="notok"
+  db_status="notok"
   counter=0
   set +e
-  while [ $mysql_status = "notok" ] && [ $counter -le 30 ]; do
-    run-parts -u 0007 /home/webadm/ncup
+  while [ $db_status = "notok" ] && [ $counter -le 30 ]; do
+    php /home/webadm/dbcheck.php
     if [ $? -ne 0 ]; then
       sleep 1
       counter=$(( $counter + 1 ))
-      else mysql_status="ok"
+      else db_status="ok"
     fi
   done
+run-parts -u 0007 /home/webadm/ncup
 set -e
 #fi
 }
 
 install_nc () {
 umask 0007
-mysql_status="notok"
+db_status="notok"
 counter=0
 set +e
-while [ $mysql_status = "notok" ] && [ $counter -le 30 ]; do
-  /usr/local/bin/ncinstall.sh
+while [ $db_status = "notok" ] && [ $counter -le 30 ]; do
+  php /home/webadm/dbcheckenv.php
   if [ $? -ne 0 ]; then
     sleep 1
     counter=$(( $counter + 1 ))
-  else mysql_status="ok"
+  else db_status="ok"
   fi
 done
+/usr/local/bin/ncinstall.sh
 set -e
 php /nextcloud/occ config:import < /usr/local/bin/ncconf.json
 php /nextcloud/occ config:system:set trusted_domains 1 --value=$DOMAIN
@@ -76,4 +76,6 @@ fi
 am_i_webadm
 #startup
 umask 0007
+#hacks to reset permissions to apache user for apps that have been installed. otherwise the nextcloud status board complains
+find /nextcloud/apps2 -user webadm -maxdepth 1 -mindepth 1 -exec cp -dR {} {}.org \; -exec rm -rf {} \; -exec mv {}.org {} \;
 exec "$@"

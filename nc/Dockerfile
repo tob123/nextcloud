@@ -1,7 +1,6 @@
-FROM alpine:3.7
-# we need php 7.1 because nextcloud has a dependency on mcrypt for php saml
+FROM alpine:3.8
 # install the PHP extensions we need
-# see https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html
+# see https://docs.nextcloud.com/server/15/admin_manual/installation/source_installation.html
 ###
 ENV HTTP_PORT=8000 \
     UPLOAD_MAX_SIZE=10G \
@@ -10,7 +9,7 @@ ENV HTTP_PORT=8000 \
     MEMORY_LIMIT=512M \
     TZ=Etc/UTC \
     WEBADM_UID=3000
-ARG NC_VER=14.0.3
+ARG NC_VER=15.0.0
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
 ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 RUN set -ex; \
@@ -39,7 +38,6 @@ RUN set -ex; \
     php7-fileinfo \
     php7-bz2 \
     php7-intl \
-    php7-mcrypt \
     php7-openssl \
 # required for specific apps
     php7-ldap \

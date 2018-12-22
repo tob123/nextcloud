@@ -118,7 +118,7 @@ RUN set -ex; \
     mkdir /run/apache2; \
     chown apache:apache /run/apache2; \
     chmod 700 /run/apache2; \
-    mkdir -p /nc/data /nc/config /nc/apps2 /nc/themes; \
+    mkdir -p /nc/data /nc/themes; \
     tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
     chown -R webadm:apache /nc ; \
     chown -R webadm:apache /nextcloud ; \

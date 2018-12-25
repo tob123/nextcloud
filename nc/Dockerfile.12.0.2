@@ -6,7 +6,6 @@ ENV HTTP_PORT=8000 \
     UPLOAD_MAX_SIZE=10G \
     APC_SHM_SIZE=128M \
     OPCACHE_MEM_SIZE=128 \
-    MEMORY_LIMIT=512M \
     TZ=Etc/UTC \
     WEBADM_UID=3000
 ARG NC_VER=12.0.2
@@ -111,33 +110,36 @@ RUN set -ex; \
     echo "extension="smbclient.so"" > /etc/php7/conf.d/00_smbclient.ini ;\
     apk del --purge build-dependencies ;\
     rm -rf /tmp/smbclient /tmp/nextcloud.asc /tmp/nextcloud-${NC_VER}.tar.bz2.sha256 /tmp/nextcloud-${NC_VER}.tar.bz2.asc /tmp/${NC_VER}.tar.bz2.md5 /root/.gnupg ;\
-    adduser -u $WEBADM_UID -D -G apache -g 'website administrator' -s /sbin/nologin webadm ; \
+#    adduser -u $WEBADM_UID -D -G apache -g 'website administrator' -s /sbin/nologin webadm ; \
     sed -i "s/80/${HTTP_PORT}/g" /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/error.log/\/proc\/self\/fd\/2/' /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/access.log/\/proc\/self\/fd\/1/' /etc/apache2/httpd.conf; \
     mkdir /run/apache2; \
     chown apache:apache /run/apache2; \
     chmod 700 /run/apache2; \
-    mkdir -p /nc/data /nc/config /nc/apps2 /nc/themes; \
+    mkdir -p /nc/data /nc/themes; \
     tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
-    chown -R webadm:apache /nc ; \
-    chown -R webadm:apache /nextcloud ; \
-    chown webadm /tmp/nextcloud-${NC_VER}.tar.bz2 ;\
+    chown -R apache:apache /nc ; \
+    chown -R apache:apache /nextcloud/config ; \
+#    chown webadm /tmp/nextcloud-${NC_VER}.tar.bz2 ;\
     rm /tmp/nextcloud-${NC_VER}.tar.bz2 ;\
-    mkdir /home/webadm/ncup
+    mkdir /usr/local/ncup
 COPY index.php /var/www/localhost/htdocs/
 COPY nc_opccache.ini nc_apcu.ini /etc/php7/conf.d/
-COPY checkcontainer.sh ncinstall.sh php-entry.sh occ ncconf.json /usr/local/bin/
-COPY ncup /home/webadm/ncup/
-COPY dbcheck.php dbcheckenv.php /home/webadm/
+COPY checkcontainer.sh ncinstall.sh php-entry-dev.sh occ ncconf.json /usr/local/bin/
+COPY ncup /usr/local/ncup/
+COPY config.php dbcheck.php dbcheckenv.php /usr/local/
+COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
 COPY limitexcept /root/
 RUN set -ex; \
     \
-    chown -R webadm /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini \
-    /usr/local/bin/occ /home/webadm; \
-    chmod +x /usr/local/bin/occ /usr/local/bin/php-entry.sh /home/webadm/ncup/ncup; \
+   chmod +r /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini; \
+#    /usr/local/bin/occ /home/webadm; \
+    chmod +rx /usr/local/bin/occ /usr/local/bin/ncinstall.sh /usr/local/bin/occ /usr/local/bin/php-entry-dev.sh /usr/local/ncup/ncup; \
+    chmod +r /usr/local/bin/ncconf.json /usr/local/config.php /usr/local/dbcheckenv.php /usr/local/dbcheck.php; \
+    chmod +r /etc/apache2/conf.d/httpd-nc.conf /etc/apache2/conf.d/cis.conf; \
     #get suid and gid files out of the way.
-    chmod -R g-s /home/webadm /var/log/apache2 /var/www/localhost/htdocs; \
+    chmod -R g-s /var/log/apache2 /var/www/localhost/htdocs; \
     chmod -R u-s /usr/sbin/suexec; \
 #sed -i 's/logs\/error.log/\/tmp\/logpipe/' /etc/apache2/httpd.conf ; \
 #sed -i 's/logs\/access.log/\/tmp\/logpipe/' /etc/apache2/httpd.conf
@@ -173,14 +175,19 @@ RUN set -ex; \
 # some php items
 PHPCONF=/etc/php7/php.ini; \
 #hide php version from headers:
-sed -i 's/expose_php = On/expose_php = Off/' $PHPCONF
+sed -i 's/expose_php = On/expose_php = Off/' $PHPCONF; \
 
-USER webadm
+### new stuff to move to only apache user
+
+mkdir /nextcloud/apps2; \
+chown apache /nextcloud/apps2
+
+
+USER apache
 RUN  chmod 770 /nextcloud/config; \
-     mkdir /nextcloud/apps2; \
+#     mkdir /nextcloud/apps2; \
      chmod 770 /nextcloud/apps2
 VOLUME /nc/data /nextcloud/config /nextcloud/apps2
-COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
 EXPOSE $HTTP_PORT
 ENV DOMAIN=localhost \
     DB_TYPE=sqlite3 \
@@ -192,12 +199,14 @@ ENV DOMAIN=localhost \
     DB_USER="nextcloud" \
     DB_PASS="" \
     DB_NAME="nextcloud" \
+    AUTO_CONV_FC="YES" \
+    MEMORY_LIMIT=512M \
     #another step to get iconv working
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh
 LABEL description="Nextcloud Docker container without root gosu sudo or other wrappers that use root" \
       nextcloud="Nextcloud v${NC_VER}" \
       maintainer="Appelo Solutions <tob@nice.eu>"
-ENTRYPOINT ["php-entry.sh"]
+ENTRYPOINT ["php-entry-dev.sh"]
 CMD ["httpd", "-DFOREGROUND"]
     

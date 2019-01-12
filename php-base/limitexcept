@@ -1,3 +1,0 @@
-<LimitExcept GET POST OPTIONS>
-Require all denied
-</LimitExcept>

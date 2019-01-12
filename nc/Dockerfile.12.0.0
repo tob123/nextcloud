@@ -6,13 +6,11 @@ ENV HTTP_PORT=8000 \
     UPLOAD_MAX_SIZE=10G \
     APC_SHM_SIZE=128M \
     OPCACHE_MEM_SIZE=128 \
-    TZ=Etc/UTC \
-    WEBADM_UID=3000
+    TZ=Etc/UTC
 ARG NC_VER=12.0.0
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
 ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 RUN set -ex; \
-    \
     apk update && apk upgrade && apk add \
 # required packages
     php7-ctype \
@@ -64,6 +62,7 @@ RUN set -ex; \
 #iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
 # the version from edge is ok though.
     && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv && \
+#    gnu-libiconv && \
 # download nextcloud stuff
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module
     apk add --virtual build-dependencies \
@@ -111,7 +110,7 @@ RUN set -ex; \
     apk del --purge build-dependencies ;\
     rm -rf /tmp/smbclient /tmp/nextcloud.asc /tmp/nextcloud-${NC_VER}.tar.bz2.sha256 /tmp/nextcloud-${NC_VER}.tar.bz2.asc /tmp/${NC_VER}.tar.bz2.md5 /root/.gnupg ;\
 #    adduser -u $WEBADM_UID -D -G apache -g 'website administrator' -s /sbin/nologin webadm ; \
-    sed -i "s/80/${HTTP_PORT}/g" /etc/apache2/httpd.conf ; \
+    sed -i "s/80/\$\{HTTP_PORT\}/g" /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/error.log/\/proc\/self\/fd\/2/' /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/access.log/\/proc\/self\/fd\/1/' /etc/apache2/httpd.conf; \
     mkdir /run/apache2; \
@@ -132,12 +131,11 @@ COPY config.php dbcheck.php dbcheckenv.php /usr/local/
 COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
 COPY limitexcept /root/
 RUN set -ex; \
-    \
-   chmod +r /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini; \
+#   chmod +r /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini; \
 #    /usr/local/bin/occ /home/webadm; \
-    chmod +rx /usr/local/bin/occ /usr/local/bin/ncinstall.sh /usr/local/bin/occ /usr/local/bin/php-entry-dev.sh /usr/local/ncup/ncup; \
-    chmod +r /usr/local/bin/ncconf.json /usr/local/config.php /usr/local/dbcheckenv.php /usr/local/dbcheck.php; \
-    chmod +r /etc/apache2/conf.d/httpd-nc.conf /etc/apache2/conf.d/cis.conf; \
+#    chmod +rx /usr/local/bin/occ /usr/local/bin/ncinstall.sh /usr/local/bin/occ /usr/local/bin/php-entry-dev.sh /usr/local/ncup/ncup; \
+#    chmod +r /usr/local/bin/ncconf.json /usr/local/config.php /usr/local/dbcheckenv.php /usr/local/dbcheck.php; \
+#    chmod +r /etc/apache2/conf.d/httpd-nc.conf /etc/apache2/conf.d/cis.conf; \
     #get suid and gid files out of the way.
     chmod -R g-s /var/log/apache2 /var/www/localhost/htdocs; \
     chmod -R u-s /usr/sbin/suexec; \

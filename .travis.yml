@@ -4,7 +4,7 @@ before_install:
   - docker --version
   - docker-compose --version
 script:
-  - docker-compose -f docker-compose.test.yml up -d --build 
+  - docker-compose -f ./nc/docker-compose.test.yml up -d --build
   - docker container ls
 #  - SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" spcgeonode_django_1)
 after_script:

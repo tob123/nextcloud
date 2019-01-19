@@ -68,7 +68,6 @@ if [ $(whoami) = apache ]; then
     install_nc
 #    chmod 660 /nextcloud/config/config.php
     tunables
-    exit 0
   fi
   if [ $nc_installed = "yes" ]; then
     are_we_upgraded

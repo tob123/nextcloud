@@ -19,6 +19,9 @@ services:
       - NC_PASS=test
     depends_on: 
       - sut-db
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/checkcontainer_ci.sh"]
+
   sut-db:
     image: mariadb
     networks:
@@ -28,10 +31,10 @@ services:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_PASSWORD=nextcloud
-    healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 40s
-      retries: 10
+#    healthcheck:
+#      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+#      timeout: 40s
+#      retries: 10
 networks:
   front:
   back:

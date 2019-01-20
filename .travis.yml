@@ -23,5 +23,6 @@ script:
     counter=$(( $counter + 1 ))
     done
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
+  - docker logs nc_sut_1
 after_script:
   - docker container ls

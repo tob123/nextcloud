@@ -29,8 +29,14 @@ script:
 after_script:
   - docker container ls
 before_deploy:
+  - docker login -u "$DOCKER_HUB_U" -p "$DOCKER_HUB_P"
+deploy:
+  provider: script
+  script: 
+  - docker push tob123/nextcloud-staging:${VERSION}
   - |
     if [ -n $LATEST_MINOR ]; then
     MAJOR_TAG=$(echo $VERSION | awk -F. {' print $1'})
-    docker tag tob123/nextcloud:${VERSION} tob123/nextcloud:${MAJOR_TAG}
+    docker tag tob123/nextcloud-staging:${VERSION} tob123/nextcloud-staging:${MAJOR_TAG}
+    docker push tob123/nextcloud-staging:${MAJOR_TAG}
     fi

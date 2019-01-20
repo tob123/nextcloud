@@ -7,7 +7,7 @@ services:
       dockerfile: ./Dockerfile
       args:
        - NC_VER=$VERSION
-    image: tob123/nextcloud:${VERSION}
+    image: tob123/nextcloud-staging:${VERSION}
     networks:
       front:
       back:

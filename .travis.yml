@@ -30,6 +30,7 @@ after_script:
   - docker container ls
 before_deploy:
   - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
+  - docker container ls
 deploy:
   skip_cleanup: true
   provider: script

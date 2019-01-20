@@ -28,13 +28,16 @@ script:
   - docker logs nc_sut_1
 after_script:
   - docker container ls
+  - docker image ls
 before_deploy:
   - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
   - docker container ls
+  - docker image ls
 deploy:
   skip_cleanup: true
   provider: script
   script: 
+  - docker image ls
   - docker push tob123/nextcloud-staging:${VERSION}
   - |
     if [ -n $LATEST_MINOR ]; then

@@ -1,15 +1,16 @@
 version: 2
 jobs:
   build:
-    machine: true
-#      - image: debian:stretch
+#    machine: true
+    docker: 
+      - image: docker:stable-git
     steps:
       - checkout
-#      - setup_remote_docker
+      - setup_remote_docker
       - run: |
-          export NC_PASS_CI=`pwgen -s -N1 20`
-          export DB_PASS_CI=`pwgen -s -N1 20`
-          export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
+          export NC_PASS_CI=test
+          export DB_PASS_CI=test
+          export MYSQL_ROOT_PASSWORD_CI=test
           export VERSION=13.0.9
       - run: |
           docker-compose -f ./nc/docker-compose.test.yml up -d --build

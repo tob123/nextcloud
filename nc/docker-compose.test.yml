@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+      args:
+       - NC_VER=$VERSION
     networks:
       front:
       back:

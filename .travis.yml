@@ -2,8 +2,26 @@ services:
   - docker
 env:
   matrix:
-  - VERSION=13.0.7
   - VERSION=15.0.2
+  - VERSION=15.0.1
+  - VERSION=15.0.0
+  - VERSION=14.0.6
+  - VERSION=14.0.5
+  - VERSION=14.0.4
+  - VERSION=14.0.3
+  - VERSION=14.0.2
+  - VERSION=14.0.1
+  - VERSION=14.0.0
+  - VERSION=13.0.9
+  - VERSION=13.0.8
+  - VERSION=13.0.7
+  - VERSION=13.0.6
+  - VERSION=13.0.5
+  - VERSION=13.0.4
+  - VERSION=13.0.3
+  - VERSION=13.0.2
+  - VERSION=13.0.1
+  - VERSION=13.0.0
 before_install:
   - docker --version
   - docker-compose --version
@@ -19,6 +37,5 @@ script:
     counter=$(( $counter + 1 ))
     done
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
-#  - SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" spcgeonode_django_1)
 after_script:
   - docker container ls

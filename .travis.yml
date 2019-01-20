@@ -36,4 +36,4 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script: docker push tob123/nextcloud-staging:${VERSION}
+  script: bash dockpush.sh

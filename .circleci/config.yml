@@ -1,11 +1,11 @@
 version: 2
 jobs:
   build:
-    docker:
+    machine:
 #      - image: debian:stretch
     steps:
       - checkout
-      - setup_remote_docker
+#      - setup_remote_docker
       - run: |
           export NC_PASS_CI=`pwgen -s -N1 20`
           export DB_PASS_CI=`pwgen -s -N1 20`

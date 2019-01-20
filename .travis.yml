@@ -6,6 +6,13 @@ before_install:
 script:
   - docker-compose -f ./nc/docker-compose.test.yml up -d --build
   - docker container ls
+  - |
+    SUT_HEALTH="notok" && counter=0
+    while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 30 ]; do
+    SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
+    sleep 2
+    counter=$(( $counter + 1 ))
+    done
 #  - SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" spcgeonode_django_1)
 after_script:
   - docker container ls

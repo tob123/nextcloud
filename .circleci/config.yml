@@ -1,9 +1,10 @@
 version: 2.1
 
 orbs:
-    hello: circleci/hello-build@0.0.5
+    anchore-engine: anchore/anchore-engine@1.1.0
 
 workflows:
-    "Hello Workflow":
+    scan_image:
         jobs:
-          - hello/hello-build
+          - anchore/image_scan:
+              image_name: 'docker.io/anchore/anchore-engine:latest'

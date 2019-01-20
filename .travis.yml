@@ -5,12 +5,12 @@ env:
   - VERSION=15.0.2
   - VERSION=15.0.1
 before_install:
-  - sudo apt-get install -y whois
+  - sudo apt-get install -y pwgen
   - docker --version
   - docker-compose --version
-  - export NC_PASS_CI=`mkpasswd`
-  - export DB_PASS_CI=`mkpasswd`
-  - export MYSQL_ROOT_PASSWORD_CI=`mkpasswd`
+  - export NC_PASS_CI=`pwgen -s -N1 20`
+  - export DB_PASS_CI=`pwgen -s -N1 20`
+  - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
 script:
   - docker-compose -f ./nc/docker-compose.test.yml up -d --build
   - docker container ls

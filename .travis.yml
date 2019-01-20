@@ -29,8 +29,9 @@ script:
 after_script:
   - docker container ls
 before_deploy:
-  - docker login -u "$DOCKER_HUB_U" -p "$DOCKER_HUB_P"
+  - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
 deploy:
+  skip_cleanup: true
   provider: script
   script: 
   - docker push tob123/nextcloud-staging:${VERSION}

@@ -5,5 +5,5 @@ workflows:
   scan_image:
     jobs:
       - anchore/image_scan:
-          image_name: 'tob123/nextcloud-staging:15'
+          image_name: 'docker.io/anchore/anchore-engine:latest'
           timeout: '300'

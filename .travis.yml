@@ -9,7 +9,7 @@ script:
   - |
     SUT_HEALTH="notok" && counter=0
     while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 30 ]; do
-    SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
+    SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1)
     sleep 2
     counter=$(( $counter + 1 ))
     done

@@ -2,8 +2,10 @@ services:
   - docker
 env:
   matrix:
-  - VERSION=15.0.2
-  - VERSION=15.0.1
+  - VERSION=15.0.2 LATEST_MINOR=true
+  - VERSION=15.0.0
+  - VERSION=14.0.6 LATEST_MINOR=true
+  - VERSION=14.0.3
 before_install:
   - sudo apt-get install -y pwgen
   - docker --version
@@ -26,3 +28,9 @@ script:
   - docker logs nc_sut_1
 after_script:
   - docker container ls
+before_deploy:
+  - |
+    if [ -n $LATEST_MINOR ]; then
+    MAJOR_TAG=$(echo $VERSION | awk -F. {' print $1'})
+    docker tag tob123/nextcloud:${VERSION} tob123/nextcloud:${MAJOR_TAG}
+    fi

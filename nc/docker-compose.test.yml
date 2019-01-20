@@ -16,9 +16,9 @@ services:
       - DB_NAME=nextcloud
       - DB_HOST=sut-db
       - DB_USER=nextcloud
-      - DB_PASS=nextcloud
+      - DB_PASS=$DB_PASS_CI
       - NC_ADMIN=admin1234
-      - NC_PASS=test
+      - NC_PASS=$NC_PASS_CI
     depends_on: 
       - sut-db
     healthcheck:
@@ -29,10 +29,10 @@ services:
     networks:
       back:
     environment:
-      - MYSQL_ROOT_PASSWORD=averycomplicatedpasswordthatseemsuselesstoenterhere
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD_CI
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
-      - MYSQL_PASSWORD=nextcloud
+      - MYSQL_PASSWORD=$DB_PASS_CI
 #    healthcheck:
 #      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
 #      timeout: 40s

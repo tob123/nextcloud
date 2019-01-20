@@ -4,27 +4,12 @@ env:
   matrix:
   - VERSION=15.0.2
   - VERSION=15.0.1
-  - VERSION=15.0.0
-  - VERSION=14.0.6
-  - VERSION=14.0.5
-  - VERSION=14.0.4
-  - VERSION=14.0.3
-  - VERSION=14.0.2
-  - VERSION=14.0.1
-  - VERSION=14.0.0
-  - VERSION=13.0.9
-  - VERSION=13.0.8
-  - VERSION=13.0.7
-  - VERSION=13.0.6
-  - VERSION=13.0.5
-  - VERSION=13.0.4
-  - VERSION=13.0.3
-  - VERSION=13.0.2
-  - VERSION=13.0.1
-  - VERSION=13.0.0
 before_install:
   - docker --version
   - docker-compose --version
+  - export NC_PASS_CI=`mkpasswd`
+  - export DB_PASS_CI=`mkpasswd`
+  - export MYSQL_ROOT_PASSWORD_CI=`mkpasswd`
 script:
   - docker-compose -f ./nc/docker-compose.test.yml up -d --build
   - docker container ls

@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  sut:
+    image: tob123/nextcloud-staging:${VERSION}
+    networks:
+      front:
+      back:
+    user: apache
+    ports:
+      - 8000:8000
+    environment:
+      - DB_TYPE=mysql
+      - DB_NAME=nextcloud
+      - DB_HOST=sut-db
+      - DB_USER=nextcloud
+      - DB_PASS=${DB_PASS_CI}
+      - NC_ADMIN=admin1234
+      - NC_PASS=${NC_PASS_CI}
+    depends_on: 
+      - sut-db
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/checkcontainer_ci.sh"]
+
+  sut-db:
+    image: mariadb
+    networks:
+      back:
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD_CI}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${DB_PASS_CI}
+#    healthcheck:
+#      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+#      timeout: 40s
+#      retries: 10
+networks:
+  front:
+  back:
+    internal: true

@@ -16,6 +16,7 @@ for i in $NC_MAJOR
   do #echo $j
   if [ $LATEST_MINOR = $j ]
     then sed -i "/^  matrix:/a \ \ - VERSION=${j} LATEST_MINOR=true" .travis.yml
+    else sed -i "/^  matrix:/a \ \ - VERSION=${j}" .travis.yml
   fi
   done
 done

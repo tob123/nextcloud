@@ -3,32 +3,13 @@ services:
 env:
   matrix:
   - VERSION=15.0.4 LATEST_MINOR=true
-  - VERSION=15.0.3
-  - VERSION=15.0.2
-  - VERSION=15.0.1
-  - VERSION=15.0.0
   - VERSION=14.0.7 LATEST_MINOR=true
-  - VERSION=14.0.6
-  - VERSION=14.0.5
-  - VERSION=14.0.4
-  - VERSION=14.0.3
-  - VERSION=14.0.2
-  - VERSION=14.0.1
-  - VERSION=14.0.0
   - VERSION=13.0.9 LATEST_MINOR=true
-  - VERSION=13.0.8
-  - VERSION=13.0.7
-  - VERSION=13.0.6
-  - VERSION=13.0.5
-  - VERSION=13.0.4
-  - VERSION=13.0.3
-  - VERSION=13.0.2
-  - VERSION=13.0.1
-  - VERSION=13.0.0
 before_install:
   - sudo apt-get install -y pwgen
   - docker --version
   - docker-compose --version
+  - git clone tob123/circleci_anchore
 script:
   - export NC_PASS_CI=`pwgen -s -N1 20`
   - export DB_PASS_CI=`pwgen -s -N1 20`
@@ -53,6 +34,15 @@ before_deploy:
   - docker container ls
   - docker image ls
 deploy:
-  skip_cleanup: true
-  provider: script
-  script: bash dockpush.sh
+  - provider: script
+    skip_cleanup: true
+    script: bash dockpush.sh
+  - provider: pages
+    skip_cleanup: true
+    github-token: $GITHUB_TOKEN
+    local-dir: ./circleci_anchore/.circleci
+    repo: tob123/circleci_anchore
+    keep-history: true
+    target-branch: master
+    on:
+      branch: master

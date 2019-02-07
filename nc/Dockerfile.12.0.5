@@ -125,7 +125,7 @@ RUN set -ex; \
     mkdir /usr/local/ncup
 COPY index.php /var/www/localhost/htdocs/
 COPY nc_opccache.ini nc_apcu.ini /etc/php7/conf.d/
-COPY checkcontainer.sh ncinstall.sh php-entry-dev.sh occ ncconf.json /usr/local/bin/
+COPY checkcontain*.sh ncinstall.sh php-entry-dev.sh occ ncconf.json /usr/local/bin/
 COPY ncup /usr/local/ncup/
 COPY config.php dbcheck.php dbcheckenv.php /usr/local/
 COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/

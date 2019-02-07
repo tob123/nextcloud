@@ -2,10 +2,13 @@ services:
   - docker
 env:
   matrix:
-  - VERSION=15.0.2 LATEST_MINOR=true
+  - VERSION=15.0.4 LATEST_MINOR=true
+  - VERSION=15.0.3
+  - VERSION=15.0.2
   - VERSION=15.0.1
   - VERSION=15.0.0
-  - VERSION=14.0.6 LATEST_MINOR=true
+  - VERSION=14.0.7 LATEST_MINOR=true
+  - VERSION=14.0.6
   - VERSION=14.0.5
   - VERSION=14.0.4
   - VERSION=14.0.3
@@ -21,6 +24,7 @@ env:
   - VERSION=13.0.3
   - VERSION=13.0.2
   - VERSION=13.0.1
+  - VERSION=13.0.0
 before_install:
   - sudo apt-get install -y pwgen
   - docker --version

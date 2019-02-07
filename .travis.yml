@@ -40,7 +40,7 @@ deploy:
   - provider: pages
     skip_cleanup: true
     github-token: $GITHUB_TOKEN
-    local-dir: ./circleci_anchore/.circleci
+    local-dir: ./circleci_anchore
     repo: tob123/circleci_anchore
     keep-history: true
     target-branch: master

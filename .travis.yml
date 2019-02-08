@@ -37,6 +37,9 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: bash dockpush.sh
+  - provder: script
+    skip_cleanup: true
+    script: bash ./circleci_anchore/.circleci/gen_config_nc.sh
   - provider: pages
     skip_cleanup: true
     github-token: $GITHUB_TOKEN

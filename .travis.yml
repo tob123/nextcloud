@@ -37,8 +37,14 @@ jobs:
   - stage: before_deploy
     name: clone circleci anchore
     script: 
+      - git config --global user.email "travis@travis-ci.org"
+      - git config --global user.name "travis"
+      - cd /tmp/
       - git clone https://github.com/tob123/circleci_anchore
-      - ./circleci_anchore/.circleci/gen_config_nc.sh
+      - cd circleci_anchore
+      - ./.circleci/gen_config_nc.sh
+      - git remote rm origin
+      - git remote add origin https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/tob123/circleci_anchore.git
   - stage: deploy
     name: activate anchorescan
     provider: pages

@@ -41,6 +41,7 @@ jobs:
   include:
   - stage: before_deploy
     name: clone circleci anchore
+    script: 
       - git clone https://github.com/tob123/circleci_anchore
       - ./circleci_anchore/.circleci/gen_config_nc.sh
   - stage: deploy

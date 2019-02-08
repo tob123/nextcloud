@@ -10,8 +10,6 @@ before_install:
   - docker --version
   - docker-compose --version
   - git clone https://github.com/tob123/circleci_anchore
-  - ls
-  - ls circleci_anchore
 script:
   - export NC_PASS_CI=`pwgen -s -N1 20`
   - export DB_PASS_CI=`pwgen -s -N1 20`
@@ -28,24 +26,18 @@ script:
     done
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
   - docker logs nc_sut_1
-  - ls
-  - ls circleci_anchore
 after_script:
   - docker container ls
   - docker image ls
-  - ls
-  - ls circleci_anchore
 before_deploy:
   - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
   - docker container ls
   - docker image ls
-  - ls
-  - ls circleci_anchore
 deploy:
   - provider: script
     skip_cleanup: true
     script: bash dockpush.sh
-  - provder: script
+  - provider: script
     skip_cleanup: true
     script: bash ./circleci_anchore/.circleci/gen_config_nc.sh
   - provider: pages

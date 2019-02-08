@@ -45,4 +45,4 @@ jobs:
       - ./.circleci/gen_config_nc.sh
       - git remote rm origin
       - git remote add origin https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/tob123/circleci_anchore.git
-      - git push
+      - git push --set-upstream origin master

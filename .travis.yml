@@ -9,7 +9,6 @@ before_install:
   - sudo apt-get install -y pwgen
   - docker --version
   - docker-compose --version
-  - git clone https://github.com/tob123/circleci_anchore
 script:
   - export NC_PASS_CI=`pwgen -s -N1 20`
   - export DB_PASS_CI=`pwgen -s -N1 20`
@@ -38,10 +37,15 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: bash dockpush.sh
-  - provider: script
-    skip_cleanup: true
-    script: bash ./circleci_anchore/.circleci/gen_config_nc.sh
-  - provider: pages
+jobs:
+  include:
+  - stage: before_deploy
+    name: clone circleci anchore
+      - git clone https://github.com/tob123/circleci_anchore
+      - ./circleci_anchore/.circleci/gen_config_nc.sh
+  - stage: deploy
+    name: activate anchorescan
+    provider: pages
     skip_cleanup: true
     github-token: $GITHUB_TOKEN
     local-dir: ./circleci_anchore

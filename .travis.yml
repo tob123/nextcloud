@@ -32,7 +32,6 @@ before_deploy:
   - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
   - docker container ls
   - docker image ls
-  - ls -l ./circleci_anchore/.circleci/config.yml
 deploy:
   - provider: script
     skip_cleanup: true

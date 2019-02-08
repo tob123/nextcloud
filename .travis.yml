@@ -28,14 +28,10 @@ script:
 after_script:
   - docker container ls
   - docker image ls
-before_deploy:
   - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
   - docker container ls
   - docker image ls
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: bash dockpush.sh
+  - bash dockpush.sh
 jobs:
   include:
   - stage: before_deploy

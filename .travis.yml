@@ -19,30 +19,47 @@ script:
   - |
     SUT_HEALTH="notok" && counter=0
     while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 30 ]; do
-    SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1)
+    SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
     sleep 2
     counter=$(( $counter + 1 ))
     done
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
   - docker logs nc_sut_1
-after_script:
-  - docker container ls
-  - docker image ls
   - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
   - docker container ls
   - docker image ls
   - bash dockpush.sh
+before_deploy:
+  - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
+  - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
+  - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
 jobs:
   include:
-  - stage: before_deploy
-    name: clone circleci anchore
-    script: 
-      - git config --global user.email "travis@travis-ci.org"
-      - git config --global user.name "travis"
-      - cd /tmp/
-      - git clone https://github.com/tob123/circleci_anchore
-      - cd circleci_anchore
-      - ./.circleci/gen_config_nc.sh
-      - git remote rm origin
-      - git remote add origin https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/tob123/circleci_anchore.git
-      - git push --set-upstream origin master
+    - stage: install
+      name: setup anchore
+      script:
+        - docker-compose -f ./ac/docker-compose.yaml up -d
+        - |
+          ANC_HEALTH="notok" && counter=0
+          while [ $ANC_HEALTH != "healthy" ] && [ $counter -le 320 ]; do
+          ANC_HEALTH=$(sudo docker inspect --format="{{json .State.Health.Status}}" ac_anchore-engine_1 | tr -d '"')
+          sleep 2
+          echo waiting for container to come up
+          echo ..
+          echo .....
+          echo $counter
+          counter=$(( $counter + 1 ))
+          done
+
+#  - stage: before_deploy
+#   name: clone circleci anchore
+#    script: 
+#      - git config --global user.email "travis@travis-ci.org"
+#      - git config --global user.name "travis"
+#      - cd /tmp/
+#      - git clone https://github.com/tob123/circleci_anchore
+#      - cd circleci_anchore
+#      - ./.circleci/gen_config_nc.sh
+#      - git remote rm origin
+#      - git remote add origin https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/tob123/circleci_anchore.git
+        ##      - git push --set-upstream origin master

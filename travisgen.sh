@@ -17,7 +17,7 @@ for i in $NC_MAJOR
   do #echo $j
   if [ $LATEST_MINOR = $j ]; then
     sed -i "/^  matrix:/a \ \ - VERSION=${j} LATEST_MINOR=true" .travis.yml
-    sed -i "/placeholder_for_image_scan_begin/a \ \ \ \ \ \ \ \ \ \ docker exec ac_anchore-engine_1 anchore-cli image check docker.io/tob123/nextcloud-staging:${j}" .travis.yml
+    sed -i "/placeholder_for_image_scan_begin/a \ \ \ \ \ \ \ \ \ \ docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${j}" .travis.yml
     sed -i "/placeholder_for_image_scan_begin/a \ \ \ \ \ \ \ \ \ \ docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${j}" .travis.yml
     sed -i "/placeholder_for_image_scan_begin/a \ \ \ \ \ \ \ \ \ \ docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${j}" .travis.yml
   fi

@@ -54,13 +54,13 @@ jobs:
           #placeholder_for_image_scan_begin
           docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:15.0.4
           docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:15.0.4
-          docker exec ac_anchore-engine_1 anchore-cli image check docker.io/tob123/nextcloud-staging:15.0.4
+          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:15.0.4
           docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:14.0.7
           docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:14.0.7
-          docker exec ac_anchore-engine_1 anchore-cli image check docker.io/tob123/nextcloud-staging:14.0.7
+          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:14.0.7
           docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:13.0.9
           docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:13.0.9
-          docker exec ac_anchore-engine_1 anchore-cli image check docker.io/tob123/nextcloud-staging:13.0.9
+          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:13.0.9
           #placeholder_for_image_scan_end
 
 #  - stage: before_deploy

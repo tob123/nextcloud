@@ -9,6 +9,8 @@ before_install:
   - sudo apt-get install -y pwgen
   - docker --version
   - docker-compose --version
+  - docker pull tob123/nextcloud:${VERSION}
+  - docker-compose -f ./ac/docker-compose.yaml up -d
 # docker pull does not speed things up for this build
 #  - docker pull tob123/nextcloud-staging:${VERSION}
 script:
@@ -33,34 +35,30 @@ script:
   - bash dockpush.sh
     #this does not work since job stage install is already defined as a separate stage
     #before_deploy:
-jobs:
-  include:
-    - stage: test
-      name: setup anchore
-      script:
-        - docker-compose -f ./ac/docker-compose.yaml up -d
-        - |
-          ANC_HEALTH="notok" && counter=0
-          while [ $ANC_HEALTH != "healthy" ] && [ $counter -le 320 ]; do
-          ANC_HEALTH=$(sudo docker inspect --format="{{json .State.Health.Status}}" ac_anchore-engine_1 | tr -d '"')
-          sleep 2
-          echo waiting for container to come up
-          echo ..
-          echo .....
-          echo $counter
-          counter=$(( $counter + 1 ))
-          done
-        - |
+    #
+    #      script:
+    #    - |
+    #      ANC_HEALTH="notok" && counter=0
+    #      while [ $ANC_HEALTH != "healthy" ] && [ $counter -le 320 ]; do
+    #      ANC_HEALTH=$(sudo docker inspect --format="{{json .State.Health.Status}}" ac_anchore-engine_1 | tr -d '"')
+    #      sleep 2
+    #      echo waiting for container to come up
+    #        echo ..
+          #      echo .....
+          #echo $counter
+          #      counter=$(( $counter + 1 ))
+          #          done
+          #        - |
           #placeholder_for_image_scan_begin
-          docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:15.0.4
-          docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:15.0.4
-          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:15.0.4
-          docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:14.0.7
-          docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:14.0.7
-          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:14.0.7
-          docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:13.0.9
-          docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:13.0.9
-          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:13.0.9
+          #          docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:15.0.4
+          #          docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:15.0.4
+          #          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:15.0.4
+          #docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:14.0.7
+          #docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:14.0.7
+          #docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:14.0.7
+          #docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:13.0.9
+          #docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:13.0.9
+          #docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:13.0.9
           #placeholder_for_image_scan_end
 
 #  - stage: before_deploy

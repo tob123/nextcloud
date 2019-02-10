@@ -29,10 +29,11 @@ script:
   - docker container ls
   - docker image ls
   - bash dockpush.sh
-before_deploy:
-  - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
-  - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
-  - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
+    #this does not work since job stage install is already defined as a separate stage
+    #before_deploy:
+    #  - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
+    #  - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
+    #  - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
 jobs:
   include:
     - stage: install
@@ -50,6 +51,27 @@ jobs:
           echo $counter
           counter=$(( $counter + 1 ))
           done
+    - stage: before_deploy
+      name: scan staging images
+      VERSION: 15.0.4
+      script:
+        - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
+        - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
+        - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
+    - stage: before_deploy
+      name: scan staging images
+      VERSION: 14.0.7
+      script:
+        - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
+        - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
+        - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
+    - stage: before_deploy
+      name: scan staging images
+      VERSION: 13.0.9
+      script:
+        - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
+        - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
+        - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
 
 #  - stage: before_deploy
 #   name: clone circleci anchore

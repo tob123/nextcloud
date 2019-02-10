@@ -11,7 +11,7 @@ ARG NC_VER=15.0.4
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
 ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 RUN set -ex; \
-    apk update && apk upgrade && apk add \
+    apk add --no-cache \
 # required packages
     php7-ctype \
     php7-dom \

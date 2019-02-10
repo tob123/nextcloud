@@ -9,6 +9,7 @@ before_install:
   - sudo apt-get install -y pwgen
   - docker --version
   - docker-compose --version
+  - docker pull tob123/nextcloud-staging:${VERSION}
 script:
   - export NC_PASS_CI=`pwgen -s -N1 20`
   - export DB_PASS_CI=`pwgen -s -N1 20`

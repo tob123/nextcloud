@@ -5,17 +5,40 @@ env:
   - VERSION=15.0.4 LATEST_MINOR=true
   - VERSION=14.0.7 LATEST_MINOR=true
   - VERSION=13.0.9 LATEST_MINOR=true
+before_install:
+  - sudo apt-get install -y pwgen
+  - docker --version
+  - docker-compose --version
 # docker pull does not speed things up for this build
 #  - docker pull tob123/nextcloud-staging:${VERSION}
 script:
-  - echo bla
+  - export NC_PASS_CI=`pwgen -s -N1 20`
+  - export DB_PASS_CI=`pwgen -s -N1 20`
+  - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
+  - docker-compose -f ./nc/docker-compose.test.yml up -d --build
+  - docker container ls
+  - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
+  - |
+    SUT_HEALTH="notok" && counter=0
+    while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 30 ]; do
+    SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
+    sleep 2
+    counter=$(( $counter + 1 ))
+    done
+  - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
+  - docker logs nc_sut_1
+  - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
+  - docker container ls
+  - docker image ls
+  - bash dockpush.sh
+    #this does not work since job stage install is already defined as a separate stage
+    #before_deploy:
+    #  - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
+    #  - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
+    #  - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
 jobs:
   include:
-    - stage: before_install
-      name: setup reqs for nc build
-      script:
-        - sudo apt-get install -y pwgen
-    - stage: install
+    - stage: test
       name: setup anchore
       script:
         - docker-compose -f ./ac/docker-compose.yaml up -d
@@ -30,49 +53,12 @@ jobs:
           echo $counter
           counter=$(( $counter + 1 ))
           done
-    - stage: test
-      name: build nextcloud
-      script:
-        - export NC_PASS_CI=`pwgen -s -N1 20`
-        - export DB_PASS_CI=`pwgen -s -N1 20`
-        - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
-        - docker-compose -f ./nc/docker-compose.test.yml up -d --build
-        - docker container ls
-        - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
         - |
-          SUT_HEALTH="notok" && counter=0
-          while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 30 ]; do
-          SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
-          sleep 2
-          counter=$(( $counter + 1 ))
+          for i in 15.0.4 14.0.7 13.0.9; do
+          docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${i}
+          docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${i}
+          docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${i}
           done
-        - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
-        - docker logs nc_sut_1
-        - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
-        - docker container ls
-        - docker image ls
-        - bash dockpush.sh
-    - stage: before_deploy
-      name: scan staging images
-      VERSION: 15.0.4
-      script:
-        - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
-        - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
-        - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
-    - stage: before_deploy
-      name: scan staging images
-      VERSION: 14.0.7
-      script:
-        - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
-        - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
-        - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
-    - stage: before_deploy
-      name: scan staging images
-      VERSION: 13.0.9
-      script:
-        - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
-        - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
-        - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
 
 #  - stage: before_deploy
 #   name: clone circleci anchore

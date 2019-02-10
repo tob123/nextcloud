@@ -1,8 +1,8 @@
 #!/bin/bash
 #set -x
 #these 2 variables are set by travis
-VERSION="14.0.7"
-LATEST_MINOR="yes"
+#VERSION="14.0.7"
+#LATEST_MINOR="yes"
 #
 # the rest is locally in this script
 PROD_REPO="docker.io/tob123/nextcloud"

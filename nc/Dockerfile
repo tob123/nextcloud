@@ -61,17 +61,13 @@ RUN set -ex; \
     php7-apache2 \
 #iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
 # the version from edge is ok though.
-    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv && \
+    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
 #    gnu-libiconv && \
 # download nextcloud stuff
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module
+RUN set -ex; \
     apk add --virtual build-dependencies \
     # this is for downloading
-    ca-certificates \
-    openssl \
-    curl \
-    gnupg \
-    # and the following is for compling smbclient
     autoconf \
     automake \
     file \
@@ -83,6 +79,30 @@ RUN set -ex; \
     samba-dev \
     zlib-dev \
     git ;\
+    update-ca-certificates ; \
+    #get nextcloud and check signatures
+    cd /tmp ; \
+    git clone git://github.com/eduardok/libsmbclient-php.git /tmp/smbclient ;\
+    cd /tmp/smbclient ;\
+    phpize7 ;\
+    ./configure --with-php-config=/usr/bin/php-config7 ;\
+    make ;\
+    make install ;\
+#make install just seems to copy resulted module from /tmp/smbclient/modules to /etc/php7/conf.d/
+# so could be cleaner via  multistage build here and use copy from...
+    echo "extension="smbclient.so"" > /etc/php7/conf.d/00_smbclient.ini ;\
+    apk del --purge build-dependencies ;\
+    rm -rf /tmp/smbclient 
+
+
+RUN set -ex; \
+    apk add --virtual build-dependencies \
+    # this is for downloading
+    ca-certificates \
+    openssl \
+    curl \
+    gnupg ;\
+    # and the following is for compling smbclient
     update-ca-certificates ; \
     #get nextcloud and check signatures
     cd /tmp ; \
@@ -98,17 +118,12 @@ RUN set -ex; \
     | sed -n "s#Primary key fingerprint: \(.*\)#\1#p" | sed 's/  / /')";\
     if [ "${FINGERPRINT}" != "${GPG_nextcloud}" ]; then echo "Warning! Wrong GPG fingerprint!" && exit 1; fi ;\
     mkdir /nextcloud ;\
-    git clone git://github.com/eduardok/libsmbclient-php.git /tmp/smbclient ;\
-    cd /tmp/smbclient ;\
-    phpize7 ;\
-    ./configure --with-php-config=/usr/bin/php-config7 ;\
-    make ;\
-    make install ;\
-#make install just seems to copy resulted module from /tmp/smbclient/modules to /etc/php7/conf.d/
-# so could be cleaner via  multistage build here and use copy from...
-    echo "extension="smbclient.so"" > /etc/php7/conf.d/00_smbclient.ini ;\
     apk del --purge build-dependencies ;\
-    rm -rf /tmp/smbclient /tmp/nextcloud.asc /tmp/nextcloud-${NC_VER}.tar.bz2.sha256 /tmp/nextcloud-${NC_VER}.tar.bz2.asc /tmp/${NC_VER}.tar.bz2.md5 /root/.gnupg ;\
+    rm -rf /tmp/nextcloud.asc /tmp/nextcloud-${NC_VER}.tar.bz2.sha256 /tmp/nextcloud-${NC_VER}.tar.bz2.asc /tmp/${NC_VER}.tar.bz2.md5 /root/.gnupg ;\
+    tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
+    rm /tmp/nextcloud-${NC_VER}.tar.bz2
+
+RUN set -ex; \
 #    adduser -u $WEBADM_UID -D -G apache -g 'website administrator' -s /sbin/nologin webadm ; \
     sed -i "s/80/\$\{HTTP_PORT\}/g" /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/error.log/\/proc\/self\/fd\/2/' /etc/apache2/httpd.conf ; \
@@ -117,11 +132,9 @@ RUN set -ex; \
     chown apache:apache /run/apache2; \
     chmod 700 /run/apache2; \
     mkdir -p /nc/data /nc/themes; \
-    tar jxf /tmp/nextcloud-${NC_VER}.tar.bz2 -C /; \
     chown -R apache:apache /nc ; \
     chown -R apache:apache /nextcloud/config ; \
 #    chown webadm /tmp/nextcloud-${NC_VER}.tar.bz2 ;\
-    rm /tmp/nextcloud-${NC_VER}.tar.bz2 ;\
     mkdir /usr/local/ncup
 COPY index.php /var/www/localhost/htdocs/
 COPY nc_opccache.ini nc_apcu.ini /etc/php7/conf.d/

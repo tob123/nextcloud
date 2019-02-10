@@ -8,7 +8,6 @@ if [ ! -s versions ];then echo "nextcloud version query failed. exiting";exit 1;
 #clean existing travis file
 sed -i '/VERSION=/d' .travis.yml
 sed -i '/LATEST_MINOR=/d' .travis.yml
-sed -i '/docker exec ac_anchore-engine_1/d' .travis.yml
 #now fill the build matrix in the yml file
 for i in $NC_MAJOR
   do #echo $i
@@ -17,9 +16,6 @@ for i in $NC_MAJOR
   do #echo $j
   if [ $LATEST_MINOR = $j ]; then
     sed -i "/^  matrix:/a \ \ - VERSION=${j} LATEST_MINOR=true" .travis.yml
-    sed -i "/placeholder_for_image_scan_begin/a \ \ \ \ \ \ \ \ \ \ docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${j}" .travis.yml
-    sed -i "/placeholder_for_image_scan_begin/a \ \ \ \ \ \ \ \ \ \ docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${j}" .travis.yml
-    sed -i "/placeholder_for_image_scan_begin/a \ \ \ \ \ \ \ \ \ \ docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${j}" .travis.yml
   fi
   done
 done

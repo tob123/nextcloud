@@ -9,7 +9,10 @@ before_install:
   - sudo apt-get install -y pwgen
   - docker --version
   - docker-compose --version
-  - docker pull tob123/nextcloud:${VERSION}
+  - |
+    if docker pull tob123/nextcloud:${VERSION}; then
+      echo "docker pull is allowed to fail"
+    fi
   - docker-compose -f ./ac/docker-compose.yaml up -d
 # docker pull does not speed things up for this build
 #  - docker pull tob123/nextcloud-staging:${VERSION}

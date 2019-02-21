@@ -66,7 +66,7 @@ RUN set -ex; \
 # download nextcloud stuff
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module
 RUN set -ex; \
-    apk add --virtual build-dependencies \
+    apk add --no-cache --virtual build-dependencies \
     # this is for downloading
     autoconf \
     automake \
@@ -207,6 +207,7 @@ ENV DOMAIN=localhost \
     SITE_URL="" \
     NC_ADMIN="admin" \
     NC_PASS="" \
+    NC_UP_AUTO="yes" \
     DB_USER="nextcloud" \
     DB_PASS="" \
     DB_NAME="nextcloud" \

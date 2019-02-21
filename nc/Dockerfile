@@ -96,7 +96,7 @@ RUN set -ex; \
 
 
 RUN set -ex; \
-    apk add --virtual build-dependencies \
+    apk add --no-cache --virtual build-dependencies \
     # this is for downloading
     ca-certificates \
     openssl \

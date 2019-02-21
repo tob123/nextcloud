@@ -31,13 +31,13 @@ docker pull ${STG_REPO}:${VERSION}
 
 anch_diff () {
 if diff ${PROD_OS} ${STG_OS}; then
-  echo no diff found
-  else echo trigger push
+  echo no difference found in image content on package level
+  else echo difference found in image content on package level. triggering push
   PROD_PUSH="true"
 fi
 if diff ${PROD_FILES} ${STG_FILES}; then
-  echo no diff found
-  else echo trigger push
+  echo no difference found in image content on file level
+  else echo difference found in image content on file level. triggering push
   PROD_PUSH="true"
 fi
 rm ${PROD_OS} ${PROD_FILES} ${STG_OS} ${STG_FILES}

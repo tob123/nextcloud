@@ -47,6 +47,10 @@ tag_push () {
 docker tag ${STG_REPO}:${VERSION} ${PROD_REPO}:${VERSION}
 docker push ${PROD_REPO}:${VERSION}
 }
+tag_push_latest () {
+docker tag ${STG_REPO}:${VERSION} ${PROD_REPO}:latest
+docker push ${PROD_REPO}:latest
+}
 
 anch_image () {
 if ${AC_EXEC} image add ${PROD_REPO}:${VERSION}; then
@@ -64,15 +68,34 @@ tag_push
 PROD_PUSH="false"
 fi
 
-if [ -n $LATEST_MINOR ]; then
+if [[ -n $LATEST_MINOR && -z $LATEST ]]; then
   MAJOR_TAG=$(echo $VERSION | awk -F. {' print $1'})
   VERSION=${MAJOR_TAG}
   ${AC_EXEC} image add ${STG_REPO}:${VERSION}
   ${AC_EXEC} image wait ${STG_REPO}:${VERSION}
   anch_image
   if [ ${PROD_PUSH} = "true" ]; then
-  tag_push
-  PROD_PUSH="false"
+    tag_push
+    PROD_PUSH="false"
+  fi
+fi
+if [[ -n $LATEST_MINOR && -n $LATEST ]]; then
+  MAJOR_TAG=$(echo $VERSION | awk -F. {' print $1'})
+  VERSION=${MAJOR_TAG}
+  ${AC_EXEC} image add ${STG_REPO}:${VERSION}
+  ${AC_EXEC} image wait ${STG_REPO}:${VERSION}
+  anch_image
+  if [ ${PROD_PUSH} = "true" ]; then
+    tag_push
+    PROD_PUSH="false"
+  fi
+  VERSION=latest
+  ${AC_EXEC} image add ${STG_REPO}:${VERSION}
+  ${AC_EXEC} image wait ${STG_REPO}:${VERSION}
+  anch_image
+  if [ ${PROD_PUSH} = "true" ]; then
+    tag_push
+    PROD_PUSH="false"
   fi
 fi
 VERSION=${VERS_TRAV}

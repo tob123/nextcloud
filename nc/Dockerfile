@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.9
 # install the PHP extensions we need
 # see https://docs.nextcloud.com/server/15/admin_manual/installation/source_installation.html
 ###
@@ -128,7 +128,7 @@ RUN set -ex; \
     sed -i "s/80/\$\{HTTP_PORT\}/g" /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/error.log/\/proc\/self\/fd\/2/' /etc/apache2/httpd.conf ; \
     sed -i 's/logs\/access.log/\/proc\/self\/fd\/1/' /etc/apache2/httpd.conf; \
-    mkdir /run/apache2; \
+    if [ ! -d /run/apache2 ]; then mkdir /run/apache2; fi; \
     chown apache:apache /run/apache2; \
     chmod 700 /run/apache2; \
     mkdir -p /nc/data /nc/themes; \

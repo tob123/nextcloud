@@ -61,7 +61,7 @@ RUN set -ex; \
     php7-apache2 \
 #iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
 # the version from edge is ok though.
-    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
+    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community gnu-libiconv
 #    gnu-libiconv && \
 # download nextcloud stuff
 # some build dependencies to download and extract nextcloud and to compile the smbclient php module

@@ -47,12 +47,23 @@ if [ $AUTO_CONV_FC = "YES" ]; then
 fi
 }
 
+check_installation_vars () {
+for i in "${DB_PASS}" "${NC_PASS}"
+  do if [ -z $i ]; then
+    echo nextcloud installation needs variables '"DB_PASS"' and '"NC_PASS"' to be specified
+    exit 1
+  fi
+done
+}
+
+
 am_i_webadm () {
 if [ $(whoami) = apache ]; then
   nc_installed="no"
   are_we_installed
   # Put the configuration and apps into volumes
   if [ $nc_installed = "no" ]; then
+    check_installation_vars
     install_nc
   fi
   if [ $nc_installed = "yes" ]; then

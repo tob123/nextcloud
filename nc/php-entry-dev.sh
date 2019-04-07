@@ -55,6 +55,9 @@ for i in "${DB_PASS}" "${NC_PASS}"
   fi
 done
 }
+update_apps () {
+occ app:update --all
+}
 
 
 am_i_webadm () {
@@ -69,6 +72,9 @@ if [ $(whoami) = apache ]; then
   if [ $nc_installed = "yes" ]; then
     if [ $NC_UP_AUTO = "yes" ]; then
     are_we_upgraded
+    fi
+    if [ $NC_APP_UP_AUTO= "yes" ]; then
+    update_apps
     fi
   fi
 fi

@@ -208,6 +208,7 @@ ENV DOMAIN=localhost \
     NC_ADMIN="admin" \
     NC_PASS="" \
     NC_UP_AUTO="yes" \
+    NC_APP_UP_AUTO="yes" \
     DB_USER="nextcloud" \
     DB_PASS="" \
     DB_NAME="nextcloud" \

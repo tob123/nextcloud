@@ -73,7 +73,7 @@ if [ $(whoami) = apache ]; then
     if [ $NC_UP_AUTO = "yes" ]; then
     are_we_upgraded
     fi
-    if [ $NC_APP_UP_AUTO= "yes" ]; then
+    if [ $NC_APP_UP_AUTO = "yes" ]; then
     update_apps
     fi
   fi

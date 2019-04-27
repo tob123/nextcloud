@@ -26,6 +26,9 @@ are_we_upgraded () {
 PHP_CHK_FILE=dbcheck.php
 check_db
 occ upgrade
+if [ $ADD_INDEX_AUTO = "YES" ]; then
+  occ db:add-missing-indices
+fi
 set -e
 }
 
@@ -44,6 +47,9 @@ if [ $CRON_TYPE = "WEB" ]; then
 fi
 if [ $AUTO_CONV_FC = "YES" ]; then
   occ db:convert-filecache-bigint
+fi
+if [ $ADD_INDEX_AUTO = "YES" ]; then
+  occ db:add-missing-indices
 fi
 }
 

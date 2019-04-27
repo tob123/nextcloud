@@ -189,6 +189,9 @@ RUN set -ex; \
 PHPCONF=/etc/php7/php.ini; \
 #hide php version from headers:
 sed -i 's/expose_php = On/expose_php = Off/' $PHPCONF; \
+#make resource limits configurable via environment variables
+sed -i "s/memory_limit = 128M/memory_limit = \$\{MEMORY_LIMIT\}/" $PHPCONF; \
+sed -i "s/upload_max_filesize = 2M/upload_max_filesize = \$\{UPLOAD_MAX_SIZE\}/" $PHPCONF; \
 
 ### new stuff to move to only apache user
 
@@ -203,6 +206,7 @@ RUN  chmod 770 /nextcloud/config; \
 VOLUME /nc/data /nextcloud/config /nextcloud/apps2
 EXPOSE $HTTP_PORT
 ENV DOMAIN=localhost \
+    ADD_INDEX_AUTO="YES" \
     DB_TYPE=sqlite3 \
     DB_HOST=localhost \
     CRON_TYPE=WEB \

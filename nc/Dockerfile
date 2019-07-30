@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.10
 # install the PHP extensions we need
 # see https://docs.nextcloud.com/server/15/admin_manual/installation/source_installation.html
 ###
@@ -59,9 +59,11 @@ RUN set -ex; \
     curl \
 # webserver and php
     php7-apache2 \
+#since alpine 3.10 gnu-libiconv should work from standard repo
+    gnu-libiconv ; \
 #iconv does not perfectly work from alpine stable. see also here: https://github.com/docker-library/php/issues/240
 # the version from edge is ok though.
-    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community gnu-libiconv; \
+#    && apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community gnu-libiconv; \
 # make the image reproducable by dropping fontcache. see also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=864082
     rm -rf /var/cache/fontconfig/
 #    gnu-libiconv && \

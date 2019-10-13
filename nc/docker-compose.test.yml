@@ -8,6 +8,7 @@ services:
       args:
        - NC_VER=$VERSION
     image: tob123/nextcloud-staging:${VERSION}
+    container_name: nc_sut_1
     networks:
       front:
       back:

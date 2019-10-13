@@ -45,6 +45,7 @@ version: '2'
 services:
   anchore-engine:
     image: docker.io/anchore/anchore-engine:latest
+    container_name: ac_anchore-engine_1
     #privileged: true
     depends_on:
      - anchore-db

@@ -7,7 +7,7 @@
 # the rest is locally in this script
 PROD_REPO="docker.io/tob123/nextcloud"
 STG_REPO="docker.io/tob123/nextcloud-staging"
-AC_EXEC="docker exec ac_anchore-engine_1 anchore-cli"
+AC_EXEC="anchore-cli"
 IMAGE_COMPARE="false"
 PROD_PUSH="false"
 #try to store the variable from travis and restore it later
@@ -55,7 +55,7 @@ docker push ${PROD_REPO}:latest
 anch_image () {
 if ${AC_EXEC} image add ${PROD_REPO}:${VERSION}; then
   IMAGE_COMPARE=true
-  dock_pull
+#  dock_pull
   anch_content
   anch_diff
   else PROD_PUSH="true"

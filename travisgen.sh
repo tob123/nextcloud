@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 # what major versions to support
-NC_MAJOR="15 16 17"
-NC_LATEST="17"
+NC_MAJOR="16 17 18"
+NC_LATEST="18"
 #get all available versions
 curl -sS https://download.nextcloud.com/server/releases/?F=0 | awk {' print $3'} | awk -F- {'print $2'} | awk -F. {'print $1"."$2"."$3'} | grep "^[0-9].*\.[0-9]$" | sort -n | uniq > versions
 if [ ! -s versions ];then echo "nextcloud version query failed. exiting";exit 1;fi 

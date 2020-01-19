@@ -7,9 +7,9 @@ services:
   - docker
 env:
   matrix:
-  - VERSION=17.0.2 LATEST_MINOR=true LATEST=true
+  - VERSION=18.0.0 LATEST_MINOR=true LATEST=true
+  - VERSION=17.0.2 LATEST_MINOR=true
   - VERSION=16.0.7 LATEST_MINOR=true
-  - VERSION=15.0.9 LATEST_MINOR=true
 before_install:
   - sudo apt-get install -y pwgen
   - docker --version

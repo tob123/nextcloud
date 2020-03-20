@@ -1,4 +1,4 @@
-FROM alpine:3.10
+FROM alpine:3.11
 # install the PHP extensions we need
 # see https://docs.nextcloud.com/server/15/admin_manual/installation/source_installation.html
 ###

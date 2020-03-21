@@ -32,12 +32,13 @@ install:
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
   - |
     SUT_HEALTH="notok" && counter=0
-    while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 30 ]; do
+    while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 60 ]; do
     SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
     sleep 2
     counter=$(( $counter + 1 ))
     if [ $counter -eq 30 ]; then
     echo $counter
+    docker logs nc_sut_1
     exit 1
     fi
     done

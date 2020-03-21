@@ -54,7 +54,7 @@ fi
 if [ $SET_URL = "YES" ]; then
   occ config:system:set overwrite.cli.url --value=$SITE_URL
 fi
-if [ $ENFORCE_HTTPS = "NO" ]; then
+if [ $ENFORCE_HTTPS = "YES" ]; then
   occ config:system:set overwriteprotocol --value="https"
 fi
 if [ $SET_PROXY = "YES" ]; then

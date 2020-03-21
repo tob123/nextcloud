@@ -4,7 +4,7 @@ set -ex
 are_we_installed () {
 if [ -f /nextcloud/config/config.php ]; then
   echo "config file already exists. "
-  nc_installed="yes"
+  nc_installed="YES"
 fi
 }
 
@@ -51,6 +51,17 @@ fi
 if [ $ADD_INDEX_AUTO = "YES" ]; then
   occ db:add-missing-indices
 fi
+if [ $SET_URL = "YES" ]; then
+  occ config:system:set overwrite.cli.url --value=$SITE_URL
+fi
+if [ $ENFORCE_HTTPS = "NO" ]; then
+  occ config:system:set overwriteprotocol --value="https"
+fi
+if [ $SET_PROXY = "YES" ]; then
+  occ config:system:set trusted_proxies 0 --value=$TRUSTED_PROXY
+  # the below is needed to let curl based healthcheck working from within the container.
+  occ config:system:set overwritecondadd --value=$TRUSTED_PROXY
+fi
 }
 
 check_installation_vars () {
@@ -60,6 +71,14 @@ for i in "${DB_PASS}" "${NC_PASS}"
     exit 1
   fi
 done
+if [ $SET_PROXY = "YES" ] && [ -z $TRUSTED_PROXY ]; then
+  echo please set an ip address for the proxyserver you use or set variable '"SET_PROXY"' to 'NO'
+  exit 1
+fi
+if [ $SET_URL = "YES" ] && [ -z $SITE_URL ]; then
+  echo please define variable '"SITE_URL"' e.g. https://www.mydomain.org or set variable '"SET_URL"' to 'NO'
+  exit 1
+fi
 }
 update_apps () {
 occ app:update --all
@@ -68,18 +87,18 @@ occ app:update --all
 
 am_i_webadm () {
 if [ $(whoami) = apache ]; then
-  nc_installed="no"
+  nc_installed="NO"
   are_we_installed
   # Put the configuration and apps into volumes
-  if [ $nc_installed = "no" ]; then
+  if [ $nc_installed = "NO" ]; then
     check_installation_vars
     install_nc
   fi
-  if [ $nc_installed = "yes" ]; then
-    if [ $NC_UP_AUTO = "yes" ]; then
+  if [ $nc_installed = "YES" ]; then
+    if [ $NC_UP_AUTO = "YES" ]; then
     are_we_upgraded
     fi
-    if [ $NC_APP_UP_AUTO = "yes" ]; then
+    if [ $NC_APP_UP_AUTO = "YES" ]; then
     update_apps
     fi
   fi

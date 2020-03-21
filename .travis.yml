@@ -36,6 +36,10 @@ install:
     SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
     sleep 2
     counter=$(( $counter + 1 ))
+    if [ $counter eq 30 ]; then
+    echo $counter
+    exit 1
+    fi
     done
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
   - docker logs nc_sut_1

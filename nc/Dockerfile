@@ -215,13 +215,17 @@ ENV DOMAIN=localhost \
     SITE_URL="" \
     NC_ADMIN="admin" \
     NC_PASS="" \
-    NC_UP_AUTO="yes" \
-    NC_APP_UP_AUTO="yes" \
+    NC_UP_AUTO="YES" \
+    NC_APP_UP_AUTO="YES" \
     DB_USER="nextcloud" \
     DB_PASS="" \
     DB_NAME="nextcloud" \
     AUTO_CONV_FC="YES" \
     MEMORY_LIMIT=512M \
+    SET_URL="NO" \
+    ENFORCE_HTTPS="NO" \
+    SET_PROXY="NO" \
+    TRUSTED_PROXY="" \
     #another step to get iconv working
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh

@@ -2,11 +2,6 @@ version: "3"
 
 services:
   sut:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-      args:
-       - NC_VER=$VERSION
     image: tob123/nextcloud-staging:${VERSION}
     container_name: nc_sut_1
     networks:

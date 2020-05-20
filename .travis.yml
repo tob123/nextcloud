@@ -1,21 +1,33 @@
+os: linux
+language: generic
+dist: bionic
 addons:                    
   apt:                     
     packages:              
       - python3-pip        
       - python3-setuptools 
-services:
-  - docker
 env:
   matrix:
-  - VERSION=18.0.4 LATEST_MINOR=true LATEST=true
-  - VERSION=17.0.6 LATEST_MINOR=true
-  - VERSION=16.0.9 LATEST_MINOR=true
+  - VERSION=18.0.4 VERSION_MAJOR=18 LATEST=true
+  - VERSION=17.0.6 VERSION_MAJOR=17
+  - VERSION=16.0.9 VERSION_MAJOR=16
 before_install:
+  # Configure environment so changes are picked up when the Docker daemon is restarted after upgrading
+  - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+  - export DOCKER_CLI_EXPERIMENTAL=enabled
+  - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+  # Upgrade to Docker CE 19.03 for BuildKit support
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  - docker buildx create --name builder --use
+  - docker buildx ls
   - sudo apt-get install -y pwgen
   - docker --version
   - docker-compose --version
   - |
-    if docker pull tob123/nextcloud:${VERSION}; then
+    if docker pull tob123/nextcloud-ma:${VERSION}; then
       echo "docker pull is allowed to fail"
     fi
 #  - docker-compose -f ./ac/docker-compose.yaml up -d
@@ -27,7 +39,9 @@ install:
   - export NC_PASS_CI=`pwgen -s -N1 20`
   - export DB_PASS_CI=`pwgen -s -N1 20`
   - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
-  - docker-compose -f ./nc/docker-compose.test.yml up -d --build
+  - echo "$DOCKER_HUB_P" | docker login --username "$DOCKER_HUB_U" --password-stdin
+  - bash build_and_push.sh
+  - docker-compose -f ./nc/docker-compose.test.yml up -d
   - docker container ls
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
   - |
@@ -45,31 +59,13 @@ install:
     done
   - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
   - docker logs nc_sut_1
-  - echo "$DOCKER_HUB_P" | docker login -u "$DOCKER_HUB_U" --password-stdin
   - docker container ls
   - docker image ls
-  - bash dockpush.sh
- 
 script:
-#check whether anchore is up as setup in one of the previous steps
-#  - |
-#    ANC_HEALTH="notok" && counter=0
-#    while [ $ANC_HEALTH != "healthy" ] && [ $counter -le 320 ]; do
-#    ANC_HEALTH=$(sudo docker inspect --format="{{json .State.Health.Status}}" ac_anchore-engine_1 | tr -d '"')
-#    sleep 2
-#    echo waiting for container to come up
-#    echo ..
-#    echo .....
-#    echo $counter
-#    counter=$(( $counter + 1 ))
-#    done
-#  - docker exec ac_anchore-engine_1 anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
-#  - docker exec ac_anchore-engine_1 anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
-#  - docker exec ac_anchore-engine_1 anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
   - anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}     
   - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}    
   - anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
-
 deploy:
   provider: script
   script: bash dockcompare.sh
+

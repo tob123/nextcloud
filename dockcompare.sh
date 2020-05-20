@@ -1,8 +1,8 @@
 #!/bin/bash
-#set -x
-#these 2 variables are set by travis
+set -ex
+#these 3 variables are set by travis. for example:
 #VERSION="14.0.7"
-#LATEST_MINOR="yes"
+#VERSION_MAJOR="14"
 #
 # the rest is locally in this script
 PROD_REPO="docker.io/tob123/nextcloud"
@@ -11,7 +11,6 @@ AC_EXEC="anchore-cli"
 IMAGE_COMPARE="false"
 PROD_PUSH="false"
 #try to store the variable from travis and restore it later
-VERS_TRAV=$VERSION
 
 anch_content () {
 ${AC_EXEC} image wait ${PROD_REPO}:${VERSION}
@@ -44,12 +43,21 @@ rm ${PROD_OS} ${PROD_FILES} ${STG_OS} ${STG_FILES}
 }
 
 tag_push () {
-docker tag ${STG_REPO}:${VERSION} ${PROD_REPO}:${VERSION}
-docker push ${PROD_REPO}:${VERSION}
+	docker buildx build \
+	--platform linux/amd64,linux/arm/v7 \
+	--build-arg NC_VER=${VERSION} \
+	--tag ${PROD_REPO}:${VERSION} \
+	--tag ${PROD_REPO}:${VERSION_MAJOR} \
+	--push --progress plain nc
 }
 tag_push_latest () {
-docker tag ${STG_REPO}:${VERSION} ${PROD_REPO}:latest
-docker push ${PROD_REPO}:latest
+	docker buildx build \
+	--platform linux/amd64,linux/arm/v7 \
+	--build-arg NC_VER=${VERSION} \
+	--tag ${PROD_REPO}:${VERSION} \
+	--tag ${PROD_REPO}:${VERSION_MAJOR} \
+	--tag ${PROD_REPO}:latest \
+	--push --progress plain nc
 }
 
 anch_image () {
@@ -63,42 +71,10 @@ fi
 }
 
 anch_image
-if [ ${PROD_PUSH} = "true" ]; then
-tag_push
-PROD_PUSH="false"
+if [[ ${PROD_PUSH} = "true" && -n $LATEST ]]; then
+  tag_push_latest
+  exit 0
 fi
-
-if [[ -n $LATEST_MINOR && -z $LATEST ]]; then
-  MAJOR_TAG=$(echo $VERSION | awk -F. {' print $1'})
-  VERSION=${MAJOR_TAG}
-  ${AC_EXEC} image add ${STG_REPO}:${VERSION}
-  ${AC_EXEC} image wait ${STG_REPO}:${VERSION}
-  anch_image
-  if [ ${PROD_PUSH} = "true" ]; then
-    tag_push
-    PROD_PUSH="false"
-  fi
+if [[ ${PROD_PUSH} = "true" ]]; then
+  tag_push
 fi
-if [[ -n $LATEST_MINOR && -n $LATEST ]]; then
-  MAJOR_TAG=$(echo $VERSION | awk -F. {' print $1'})
-  VERSION=${MAJOR_TAG}
-  ${AC_EXEC} image add ${STG_REPO}:${VERSION}
-  ${AC_EXEC} image wait ${STG_REPO}:${VERSION}
-  anch_image
-  if [ ${PROD_PUSH} = "true" ]; then
-    tag_push
-    PROD_PUSH="false"
-  fi
-  VERSION=latest
-  ${AC_EXEC} image add ${STG_REPO}:${VERSION}
-  ${AC_EXEC} image wait ${STG_REPO}:${VERSION}
-  anch_image
-  if [ ${PROD_PUSH} = "true" ]; then
-    tag_push
-    PROD_PUSH="false"
-  fi
-fi
-VERSION=${VERS_TRAV}
-#docker tag tob123/nextcloud-staging:${VERSION} tob123/nextcloud-staging:${MAJOR_TAG}
-#docker push tob123/nextcloud-staging:${MAJOR_TAG}
-

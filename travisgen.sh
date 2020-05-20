@@ -15,10 +15,10 @@ for i in $NC_MAJOR
   LATEST_MINOR=$(cat versions | grep ^${i} | sort -n | tail -1)
   for j in $(cat versions | grep ^${i}); do 
     if [[ $NC_LATEST = $i && $LATEST_MINOR = $j ]] ; then
-      sed -i "/^  matrix:/a \ \ - VERSION=${j} LATEST_MINOR=true LATEST=true" .travis.yml
+      sed -i "/^  matrix:/a \ \ - VERSION=${j} VERSION_MAJOR=${i} LATEST=true" .travis.yml
     fi
     if [[ $LATEST_MINOR = $j && $NC_LATEST != $i ]]; then
-      sed -i "/^  matrix:/a \ \ - VERSION=${j} LATEST_MINOR=true" .travis.yml
+      sed -i "/^  matrix:/a \ \ - VERSION=${j} VERSION_MAJOR=${i}" .travis.yml
     fi
   done
 done

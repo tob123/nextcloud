@@ -4,7 +4,7 @@ set -e
 NC_MAJOR="16 17 18"
 NC_LATEST="18"
 #get all available versions
-curl -sS https://download.nextcloud.com/server/releases/?F=0 | awk {' print $3'} | awk -F- {'print $2'} | awk -F. {'print $1"."$2"."$3'} | grep "^[0-9].*\.[0-9]$" | sort -n | uniq > versions
+curl -sS https://download.nextcloud.com/server/releases/?F=0 | awk {' print $3'} | awk -F- {'print $2'} | awk -F. {'print $1"."$2"."$3'} | grep "^[0-9].*\.[0-9]" | sort -n | uniq > versions
 if [ ! -s versions ];then echo "nextcloud version query failed. exiting";exit 1;fi 
 #clean existing travis file
 sed -i '/VERSION=/d' .travis.yml

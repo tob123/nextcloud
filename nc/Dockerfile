@@ -7,7 +7,7 @@ ENV HTTP_PORT=8000 \
     APC_SHM_SIZE=128M \
     OPCACHE_MEM_SIZE=128 \
     TZ=Etc/UTC
-ARG NC_VER=15.0.4
+ARG NC_VER=16.0.9
 ARG NC_URL=https://download.nextcloud.com/server/releases/nextcloud-
 ARG GPG_nextcloud="2880 6A87 8AE4 23A2 8372 792E D758 99B9 A724 937A"
 RUN set -ex; \
@@ -209,7 +209,7 @@ VOLUME /nc/data /nextcloud/config /nextcloud/apps2
 EXPOSE $HTTP_PORT
 ENV DOMAIN=localhost \
     ADD_INDEX_AUTO="YES" \
-    DB_TYPE=sqlite3 \
+    DB_TYPE=sqlite \
     DB_HOST=localhost \
     CRON_TYPE=WEB \
     SITE_URL="" \

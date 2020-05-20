@@ -9,6 +9,11 @@ fi
 }
 
 check_db () {
+if [ $DB_TYPE = sqlite ]; then
+  db_status="ok"
+  return
+fi
+
 db_status="notok"
 counter=0
 set +e
@@ -65,12 +70,16 @@ fi
 }
 
 check_installation_vars () {
-for i in "${DB_PASS}" "${NC_PASS}"
+for i in "${NC_PASS}"
   do if [ -z $i ]; then
-    echo nextcloud installation needs variables '"DB_PASS"' and '"NC_PASS"' to be specified
+    echo nextcloud installation needs variable '"NC_PASS"' to be specified
     exit 1
   fi
 done
+if [ -z $DB_PASS ] && [ $DB_TYPE = "mysql" ]; then
+  echo please set variable '"DB_PASS"' or use database type sqlite or postgres
+  exit 1
+fi
 if [ $SET_PROXY = "YES" ] && [ -z $TRUSTED_PROXY ]; then
   echo please set an ip address for the proxyserver you use or set variable '"SET_PROXY"' to 'NO'
   exit 1

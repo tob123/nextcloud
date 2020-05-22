@@ -27,7 +27,7 @@ before_install:
   - docker --version
   - docker-compose --version
   - |
-    if docker pull tob123/nextcloud-ma:${VERSION}; then
+    if docker pull tob123/nextcloud:${VERSION}; then
       echo "docker pull is allowed to fail"
     fi
 #  - docker-compose -f ./ac/docker-compose.yaml up -d

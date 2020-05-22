@@ -41,6 +41,9 @@ install_nc () {
 PHP_CHK_FILE=dbcheckenv.php
 check_db
 cp /usr/local/config.php /nextcloud/config/config.php
+if [ -z ${NC_PASS} ]; then
+  return
+fi
 /usr/local/bin/ncinstall.sh
 set -e
 occ config:import < /usr/local/bin/ncconf.json
@@ -72,8 +75,9 @@ fi
 check_installation_vars () {
 for i in "${NC_PASS}"
   do if [ -z $i ]; then
-    echo nextcloud installation needs variable '"NC_PASS"' to be specified
-    exit 1
+    echo nextcloud automated installation needs variable '"NC_PASS"' to be specified
+    echo "you can install nextcloud manually by visiting http://<hostname>/nextcloud:${HTTP_PORT}"
+    return
   fi
 done
 if [ -z $DB_PASS ] && [ $DB_TYPE = "mysql" ]; then

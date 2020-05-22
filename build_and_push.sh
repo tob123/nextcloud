@@ -1,6 +1,6 @@
 #/bin/bash
 set -ex
-STG_REPO="docker.io/tob123/nextcloud-ma-staging"
+STG_REPO="docker.io/tob123/nextcloud-staging"
 if [[ -n $LATEST ]]; then
 		docker buildx build --platform linux/amd64,linux/arm/v7 \
 		--build-arg NC_VER=${VERSION} \

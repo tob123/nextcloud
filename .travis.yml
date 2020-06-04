@@ -8,8 +8,8 @@ addons:
       - python3-setuptools 
 env:
   matrix:
-  - VERSION=18.0.4 VERSION_MAJOR=18 LATEST=true
-  - VERSION=17.0.6 VERSION_MAJOR=17
+  - VERSION=18.0.5 VERSION_MAJOR=18 LATEST=true
+  - VERSION=17.0.7 VERSION_MAJOR=17
   - VERSION=16.0.9 VERSION_MAJOR=16
 before_install:
   # Configure environment so changes are picked up when the Docker daemon is restarted after upgrading

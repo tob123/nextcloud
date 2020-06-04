@@ -4,6 +4,11 @@ set -ex
 are_we_installed () {
 if [ -f /nextcloud/config/config.php ]; then
   echo "config file already exists. "
+  DI=`diff /nextcloud/config/config.php /usr/local/config.php`
+  if [ -z "${DI}" ]; then
+    nc_installed="NO"
+    return
+  fi
   nc_installed="YES"
 fi
 }
@@ -76,7 +81,7 @@ check_installation_vars () {
 for i in "${NC_PASS}"
   do if [ -z $i ]; then
     echo nextcloud automated installation needs variable '"NC_PASS"' to be specified
-    echo "you can install nextcloud manually by visiting http://<hostname>/nextcloud:${HTTP_PORT}"
+    echo "you can install nextcloud manually by visiting http://<hostname>:${HTTP_PORT}"
     return
   fi
 done

@@ -4,11 +4,6 @@ set -ex
 are_we_installed () {
 if [ -f /nextcloud/config/config.php ]; then
   echo "config file already exists. "
-  DI=`diff /nextcloud/config/config.php /usr/local/config.php`
-  if [ -z "${DI}" ]; then
-    nc_installed="NO"
-    return
-  fi
   nc_installed="YES"
 fi
 }

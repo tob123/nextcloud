@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 # what major versions to support
-NC_MAJOR="18 18 19"
+NC_MAJOR="17 18 19"
 NC_LATEST="19"
 #get all available versions
 curl -sS https://download.nextcloud.com/server/releases/?F=0 | awk {' print $3'} | awk -F- {'print $2'} | awk -F. {'print $1"."$2"."$3'} | grep "^[0-9].*\.[0-9]" | sort -n | uniq > versions

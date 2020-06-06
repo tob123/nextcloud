@@ -8,9 +8,10 @@ addons:
       - python3-setuptools 
 env:
   matrix:
-  - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true
-  - VERSION=18.0.5 VERSION_MAJOR=18
-  - VERSION=17.0.7 VERSION_MAJOR=17
+  - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=pgsql
+  - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite
+  - VERSION=18.0.5 VERSION_MAJOR=18 DB_TYPE_CI=pgsql
+  - VERSION=17.0.7 VERSION_MAJOR=17 DB_TYPE_CI=pgsql
 before_install:
   # Configure environment so changes are picked up when the Docker daemon is restarted after upgrading
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
@@ -62,10 +63,12 @@ install:
   - docker container ls
   - docker image ls
 script:
+env: DB_TYPE_CI=mysql
   - anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}     
   - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}    
   - anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
 deploy:
+env: DB_TYPE_CI=mysql
   provider: script
   script: bash dockcompare.sh
 

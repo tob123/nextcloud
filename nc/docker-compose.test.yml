@@ -9,7 +9,7 @@ services:
       back:
     user: apache
     environment:
-      - DB_TYPE=mysql
+      - DB_TYPE=${DB_TYPE_CI}
       - DB_NAME=nextcloud
       - DB_HOST=sut-db
       - DB_USER=nextcloud

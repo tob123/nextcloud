@@ -38,6 +38,7 @@ RUN set -ex; \
     php7-openssl \
 # required for specific apps
     php7-ldap \
+    php7-bcmath \
     php7-ftp \
     php7-imap \
     php7-exif \

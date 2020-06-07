@@ -24,7 +24,6 @@ jobs:
         if docker pull tob123/nextcloud:${VERSION}; then
           echo "docker pull is allowed to fail"
         fi
-      - export PATH="$HOME/.local/bin/:$PATH"
       - export NC_PASS_CI=`pwgen -s -N1 20`
       - export DB_PASS_CI=`pwgen -s -N1 20`
       - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
@@ -62,6 +61,9 @@ jobs:
       stage: Vulnerabilitytest
       env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
       script:
+      - apt-get install -y python3-setuptools python3-setuptools
+      - pip3 install --user anchorecli
+      - export PATH="$HOME/.local/bin/:$PATH"
       - anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}

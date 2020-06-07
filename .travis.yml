@@ -8,11 +8,9 @@ addons:
       - python3-setuptools 
 env:
   matrix:
-  - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql
-  - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=pgsql
-  - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite
-  - VERSION=18.0.5 VERSION_MAJOR=18 DB_TYPE_CI=mysql
-  - VERSION=17.0.7 VERSION_MAJOR=17 DB_TYPE_CI=mysql
+  - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true
+  - VERSION=18.0.5 VERSION_MAJOR=18
+  - VERSION=17.0.7 VERSION_MAJOR=17
 before_install:
   # Configure environment so changes are picked up when the Docker daemon is restarted after upgrading
   - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json

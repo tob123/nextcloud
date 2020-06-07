@@ -15,6 +15,7 @@ addons:
         #  - VERSION=17.0.7 VERSION_MAJOR=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
 jobs:
   include:
+    - stage: build_and_test
     - env:
       - VERSION=19.0.0
       - VERSION_MAJOR=19
@@ -26,7 +27,6 @@ jobs:
       - VERSION_MAJOR=18
       - DB_TYPE_CI=pgsql
       - DB_IMAGE_CI=postgres
-    - stage: build_and_test
        # Configure environment so changes are picked up when the Docker daemon is restarted after upgrading
       script:
       - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json

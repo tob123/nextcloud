@@ -5,7 +5,7 @@ jobs:
   include:
     - &build_and_test
       stage: Build_and_test
-      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres
+      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18
       script:
       - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
       - export DOCKER_CLI_EXPERIMENTAL=enabled
@@ -20,16 +20,13 @@ jobs:
       - sudo apt-get install -y pwgen
       - docker --version
       - docker-compose --version
-      - |
-        if docker pull tob123/nextcloud:${VERSION}; then
-          echo "docker pull is allowed to fail"
-        fi
       - export NC_PASS_CI=`pwgen -s -N1 20`
       - export DB_PASS_CI=`pwgen -s -N1 20`
       - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
+      - docker pull tob123/nextcloud:${VERSION_PREV}
+      - docker-compose -f ./nc/docker-compose.upg.yml up -d
       - echo "$DOCKER_HUB_P" | docker login --username "$DOCKER_HUB_U" --password-stdin
       - bash build_and_push.sh
-      - docker-compose -f ./nc/docker-compose.test.yml up -d
       - docker container ls
       - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
       - |
@@ -47,16 +44,46 @@ jobs:
         done
       - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
       - docker logs nc_sut_1
+      - docker-compose -f nc/docker-compose.upg.yml rm -s -f
+      - docker-compose -f ./nc/docker-compose.test.yml up -d
+      - |
+        SUT_HEALTH="notok" && counter=0
+        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 60 ]; do
+        SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
+        sleep 2
+        counter=$(( $counter + 1 ))
+        echo $counter
+        if [ $counter -eq 60 ]; then
+        echo $counter
+        docker logs nc_sut_1
+        exit 1
+        fi
+        done
+      - docker-compose -f ./nc/docker-compose.test.yml down -v
+      - docker-compose -f ./nc/docker-compose.test.yml up -d
+      - |
+        SUT_HEALTH="notok" && counter=0
+        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 60 ]; do
+        SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
+        sleep 2
+        counter=$(( $counter + 1 ))
+        echo $counter
+        if [ $counter -eq 60 ]; then
+        echo $counter
+        docker logs nc_sut_1
+        exit 1
+        fi
+        done
       - docker container ls
       - docker image ls    
     - <<: *build_and_test
-      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
-      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=17.0.7 VERSION_MAJOR=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=17.0.7 VERSION_MAJOR=17 VERSION_PREV=16 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - &vultest
       stage: Vulnerabilitytest
       env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
@@ -68,8 +95,8 @@ jobs:
       - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
     - <<: *vultest
-      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *vultest
-      env: VERSION=18.0.5 VERSION_MAJOR=18 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *vultest
-      env: VERSION=17.0.7 VERSION_MAJOR=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=17.0.7 VERSION_MAJOR=17 VERSION_PREV=16 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

@@ -7,13 +7,17 @@ addons:
       - python3-pip        
       - python3-setuptools 
 env:
+  jobs:
         #  matrix:
   - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
   - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
   - VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
   - VERSION=18.0.5 VERSION_MAJOR=18 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
   - VERSION=17.0.7 VERSION_MAJOR=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
-script:
+jobs:
+  include:
+    - stage: build_and_test
+      script:
       - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
       - export DOCKER_CLI_EXPERIMENTAL=enabled
       - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
@@ -61,12 +65,10 @@ script:
       - docker logs nc_sut_1
       - docker container ls
       - docker image ls
-jobs:
-  include:
     - stage: security_test
       env:
-        - DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb VERSION=19.0.0
-        - DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb VERSION=18.0.5
+        - DB_TYPE_CI=sqlite 
+        - DB_IMAGE_CI=mariadb
       script:
       - anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}     
       - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}    

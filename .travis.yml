@@ -5,7 +5,7 @@ jobs:
   include:
     - &build_and_test
       stage: Build_and_test
-      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18
+      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18 STG_PUSH=true
       script:
       - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
       - export DOCKER_CLI_EXPERIMENTAL=enabled
@@ -81,9 +81,17 @@ jobs:
     - <<: *build_and_test
       env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb STG_PUSH=true
     - <<: *build_and_test
-      env: VERSION=17.0.7 VERSION_MAJOR=17 VERSION_PREV=17.0.6 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
+    - <<: *build_and_test
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+    - <<: *build_and_test
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+    - <<: *build_and_test
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=postgres DB_IMAGE_CI=mariadb
+    - <<: *build_and_test
+      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=postgres DB_IMAGE_CI=mariadb
     - &vultest
       stage: Vulnerabilitytest
       env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
@@ -95,8 +103,4 @@ jobs:
       - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
     - <<: *vultest
-      env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
-    - <<: *vultest
       env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
-    - <<: *vultest
-      env: VERSION=17.0.7 VERSION_MAJOR=17 VERSION_PREV=17.0.6 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

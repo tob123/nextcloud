@@ -1,7 +1,7 @@
 #/bin/bash
 set -ex
 STG_REPO="docker.io/tob123/nextcloud-staging"
-if [[ -n $LATEST && ${DB_TYPE_CI} = "sqlite" ]]; then
+if [[ -n $LATEST && -n ${STG_PUSH} ]]; then
 		docker buildx build --platform linux/amd64,linux/arm/v7 \
 		--build-arg NC_VER=${VERSION} \
 		--tag ${STG_REPO}:${VERSION} \
@@ -10,7 +10,7 @@ if [[ -n $LATEST && ${DB_TYPE_CI} = "sqlite" ]]; then
 		--push --progress plain nc
 	exit 0
 fi
-if [[ ${DB_TYPE_CI} = "sqlite" ]]; then
+if [[ -n ${STG_PUSH} ]]; then
   docker buildx build \
   --platform linux/amd64,linux/arm/v7 \
   --build-arg NC_VER=${VERSION} \

@@ -22,10 +22,13 @@ services:
       test: ["CMD", "/usr/local/bin/checkcontainer_ci.sh"]
 
   sut-db:
-    image: mariadb
+    image: ${DB_IMAGE_CI}
     networks:
       back:
     environment:
+      - POSTGRES_PASSWORD=${DB_PASS_CI}
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_DB=nextcloud
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD_CI}
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud

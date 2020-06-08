@@ -96,7 +96,7 @@ jobs:
       stage: Vulnerabilitytest
       env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
       script:
-      - sudo apt-get install -y python3-setuptools python3-setuptools
+      - sudo apt-get install -y python3-setuptools python3-pip
       - pip3 install --user anchorecli
       - export PATH="$HOME/.local/bin/:$PATH"
       - anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}

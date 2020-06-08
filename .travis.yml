@@ -92,6 +92,8 @@ jobs:
       env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
       env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+    - <<: *build_and_test
+      env: VERSION=17.0.7 VERSION_MAJOR=17 VERSION_PREV=17.0.6 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
     - &vultest
       stage: Vulnerabilitytest
       env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

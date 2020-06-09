@@ -92,8 +92,8 @@ jobs:
       env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
       env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
-    - &vultest
-      stage: Vulnerabilitytest
+    - &vultest_deploy
+      stage: Vulnerabilitytest and Deploy
       env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
       script:
       - sudo apt-get install -y python3-setuptools python3-pip
@@ -102,5 +102,8 @@ jobs:
       - anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
-    - <<: *vultest
+      deploy:
+        provider: script
+        script: bash dockcompare.sh
+    - <<: *vultest_deploy
       env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

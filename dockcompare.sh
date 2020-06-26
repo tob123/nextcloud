@@ -44,7 +44,7 @@ rm ${PROD_OS} ${PROD_FILES} ${STG_OS} ${STG_FILES}
 
 tag_push () {
 	docker buildx build \
-	--platform linux/amd64,linux/arm/v7 \
+	--platform linux/amd64,linux/arm/v7,linux/arm64 \
 	--build-arg NC_VER=${VERSION} \
 	--tag ${PROD_REPO}:${VERSION} \
 	--tag ${PROD_REPO}:${VERSION_MAJOR} \
@@ -52,7 +52,7 @@ tag_push () {
 }
 tag_push_latest () {
 	docker buildx build \
-	--platform linux/amd64,linux/arm/v7 \
+	--platform linux/amd64,linux/arm/v7,linux/arm64 \
 	--build-arg NC_VER=${VERSION} \
 	--tag ${PROD_REPO}:${VERSION} \
 	--tag ${PROD_REPO}:${VERSION_MAJOR} \

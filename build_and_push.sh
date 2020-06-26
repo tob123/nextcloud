@@ -2,7 +2,7 @@
 set -ex
 STG_REPO="docker.io/tob123/nextcloud-staging"
 if [[ -n $LATEST && -n ${STG_PUSH} ]]; then
-		docker buildx build --platform linux/amd64,linux/arm/v7 \
+		docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 \
 		--build-arg NC_VER=${VERSION} \
 		--tag ${STG_REPO}:${VERSION} \
 		--tag ${STG_REPO}:${VERSION_MAJOR} \
@@ -12,7 +12,7 @@ if [[ -n $LATEST && -n ${STG_PUSH} ]]; then
 fi
 if [[ -n ${STG_PUSH} ]]; then
   docker buildx build \
-  --platform linux/amd64,linux/arm/v7 \
+  --platform linux/amd64,linux/arm/v7,linux/arm64 \
   --build-arg NC_VER=${VERSION} \
   --tag ${STG_REPO}:${VERSION} \
   --tag ${STG_REPO}:${VERSION_MAJOR} \

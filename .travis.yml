@@ -81,17 +81,17 @@ jobs:
     - <<: *build_and_test
       env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb STG_PUSH=true
+      env: VERSION=18.0.6 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb STG_PUSH=true
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.6 VERSION_MAJOR=18 VERSION_PREV=18.0.5 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.6 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.6 VERSION_MAJOR=18 VERSION_PREV=18.0.5 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=18.0.6 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=18.0.6 VERSION_MAJOR=18 VERSION_PREV=18.0.5 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - &vultest_deploy
       stage: Vulnerabilitytest and Deploy
       env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
@@ -119,4 +119,4 @@ jobs:
         provider: script
         script: bash dockcompare.sh
     - <<: *vultest_deploy
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.6 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

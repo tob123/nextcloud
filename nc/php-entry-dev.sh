@@ -68,7 +68,7 @@ fi
 if [ $SET_PROXY = "YES" ]; then
   occ config:system:set trusted_proxies 0 --value=$TRUSTED_PROXY
   # the below is needed to let curl based healthcheck working from within the container.
-  occ config:system:set overwritecondadd --value=$TRUSTED_PROXY
+  occ config:system:set overwritecondaddr --value=$TRUSTED_PROXY
 fi
 }
 

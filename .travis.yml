@@ -5,7 +5,7 @@ jobs:
   include:
     - &build_and_test
       stage: Build_and_test
-      env: VERSION=19.0.1 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18 STG_PUSH=true
+      env: VERSION=19.0.2 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18 STG_PUSH=true
       script:
       - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
       - export DOCKER_CLI_EXPERIMENTAL=enabled
@@ -77,24 +77,24 @@ jobs:
       - docker container ls
       - docker image ls    
     - <<: *build_and_test
-      env: VERSION=19.0.1 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=19.0.2 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
-      env: VERSION=19.0.1 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=19.0.2 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.7 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb STG_PUSH=true
+      env: VERSION=18.0.8 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb STG_PUSH=true
     - <<: *build_and_test
-      env: VERSION=18.0.7 VERSION_MAJOR=18 VERSION_PREV=18.0.6 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.8 VERSION_MAJOR=18 VERSION_PREV=18.0.7 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.7 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.8 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.7 VERSION_MAJOR=18 VERSION_PREV=18.0.6 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.8 VERSION_MAJOR=18 VERSION_PREV=18.0.7 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.7 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=18.0.8 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
-      env: VERSION=18.0.7 VERSION_MAJOR=18 VERSION_PREV=18.0.6 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=18.0.8 VERSION_MAJOR=18 VERSION_PREV=18.0.7 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - &vultest_deploy
       stage: Vulnerabilitytest and Deploy
-      env: VERSION=19.0.1 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=19.0.2 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
       script:
       - sudo apt-get install -y python3-setuptools python3-pip
       - pip3 install --user anchorecli
@@ -119,4 +119,4 @@ jobs:
         provider: script
         script: bash dockcompare.sh
     - <<: *vultest_deploy
-      env: VERSION=18.0.7 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.8 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

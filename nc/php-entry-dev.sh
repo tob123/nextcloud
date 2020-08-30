@@ -14,6 +14,10 @@ if [ $DB_TYPE = sqlite ]; then
   return
 fi
 
+check_version () {
+NC_VERSION=`occ status --output=json | jq -r .version | awk -F. {'print $1'}`
+}
+
 db_status="notok"
 counter=0
 set +e
@@ -31,8 +35,12 @@ are_we_upgraded () {
 PHP_CHK_FILE=dbcheck.php
 check_db
 occ upgrade
+check_version
 if [ $ADD_INDEX_AUTO = "YES" ]; then
   occ db:add-missing-indices
+fi
+if [ $ADD_MIS_COL = "YES" ] && [ $NC_VERSION > 18 ]; then
+  occ db:add-missing-columns
 fi
 set -e
 }

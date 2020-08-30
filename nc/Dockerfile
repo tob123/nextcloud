@@ -53,6 +53,8 @@ RUN set -ex; \
     php7-pcntl \
 # for samba / cifs php module
     libsmbclient \
+# add json support for commandline processing
+    jq \
 #others
 # php itself
     php7 \
@@ -227,6 +229,7 @@ ENV DOMAIN=localhost \
     ENFORCE_HTTPS="NO" \
     SET_PROXY="NO" \
     TRUSTED_PROXY="" \
+    ADD_MIS_COL="YES" \
     #another step to get iconv working
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh

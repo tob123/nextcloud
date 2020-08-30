@@ -13,11 +13,6 @@ if [ $DB_TYPE = sqlite ]; then
   db_status="ok"
   return
 fi
-
-check_version () {
-NC_VERSION=`occ status --output=json | jq -r .version | awk -F. {'print $1'}`
-}
-
 db_status="notok"
 counter=0
 set +e
@@ -29,6 +24,10 @@ while [ $db_status = "notok" ] && [ $counter -le 30 ]; do
     else db_status="ok"
   fi
 done
+}
+
+check_version () {
+NC_VERSION=`occ status --output=json | jq -r .version | awk -F. {'print $1'}`
 }
 
 are_we_upgraded () {

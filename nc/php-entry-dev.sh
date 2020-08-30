@@ -39,7 +39,7 @@ check_version
 if [ $ADD_INDEX_AUTO = "YES" ]; then
   occ db:add-missing-indices
 fi
-if [ $ADD_MIS_COL = "YES" ] && [ $NC_VERSION > 18 ]; then
+if [ $ADD_MIS_COL = "YES" ] && [ $NC_VERSION -gt 18 ]; then
   occ db:add-missing-columns
 fi
 set -e

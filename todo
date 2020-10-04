@@ -1,0 +1,9 @@
+#https://github.com/Inveniem/nextcloud-azure-aks/blob/develop/docker/backend-nextcloud-apache/Dockerfile
+SetEnvIf X-Forwarded-Proto "https" HTTPS=on
+RemoteIPHeader X-Real-IP
+RemoteIPInternalProxy 172.16.0.0/12
+RemoteIPTrustedProxy 10.0.0.0/8
+RemoteIPTrustedProxy 172.16.0.0/12
+RemoteIPTrustedProxy 192.168.0.0/16
+SetEnvIf X-Forwarded-Proto "https" HTTPS=on
+

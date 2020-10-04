@@ -3,6 +3,7 @@ version: "3"
 services:
   sut:
     image: tob123/nextcloud-dev:${VERSION}
+    build: ./
     container_name: nc_sut_1
     networks:
       front:

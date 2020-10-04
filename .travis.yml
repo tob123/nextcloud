@@ -5,7 +5,7 @@ jobs:
   include:
     - stage: build_test_dev
       if: branch = master
-      env: VERSION=19.0.3 NC_VER=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18
+      env: VERSION=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18
       script:
       - sudo apt-get update
       - sudo apt-get install -y pwgen
@@ -14,7 +14,7 @@ jobs:
       - export NC_PASS_CI=`pwgen -s -N1 20`
       - export DB_PASS_CI=`pwgen -s -N1 20`
       - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
-      - docker-compose -f ./nc/docker-compose.dev.yml build
+      - docker-compose -f ./nc/docker-compose.dev.yml build --build-arg NC_VER=${VERSION}
       - docker-compose -f ./nc/docker-compose.dev.yml up -d
       - |
         SUT_HEALTH="notok" && counter=0

@@ -5,6 +5,7 @@ jobs:
   include:
     - &build_and_test
       stage: Build_and_test
+      if: tag IS present
       env: VERSION=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18 STG_PUSH=true
       script:
       - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
@@ -100,6 +101,7 @@ jobs:
       env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=18.0.8 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - &vultest_deploy
       stage: Vulnerabilitytest and Deploy
+      if: tag IS present
       env: VERSION=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
       script:
       - sudo apt-get install -y python3-setuptools python3-pip

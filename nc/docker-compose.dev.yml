@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+  sut:
+    image: tob123/nextcloud-dev:${VERSION}
+    container_name: nc_sut_1
+    networks:
+      front:
+      back:
+    user: apache
+    environment:
+      - DB_TYPE=${DB_TYPE_CI}
+      - DB_NAME=nextcloud
+      - DB_HOST=sut-db
+      - DB_USER=nextcloud
+      - DB_PASS=${DB_PASS_CI}
+      - NC_ADMIN=admin1234
+      - NC_PASS=${NC_PASS_CI}
+    depends_on: 
+      - sut-db
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/checkcontainer_ci.sh"]
+    volumes:
+      - nextcloud_data:/nc/data
+      - nextcloud_config:/nextcloud/config
+      - nextcloud_apps:/nextcloud/apps2
+  sut-db:
+    image: ${DB_IMAGE_CI}
+    networks:
+      back:
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - mariadb_data:/var/lib/mysql
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASS_CI}
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_DB=nextcloud
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD_CI}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${DB_PASS_CI}
+#    healthcheck:
+#      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+#      timeout: 40s
+#      retries: 10
+networks:
+  front:
+  back:
+    internal: true
+volumes:
+  nextcloud_data:
+  nextcloud_config:
+  nextcloud_apps:
+  pg_data:
+  mariadb_data:
+

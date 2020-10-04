@@ -148,7 +148,7 @@ COPY nc_opccache.ini nc_apcu.ini /etc/php7/conf.d/
 COPY checkcontain*.sh ncinstall.sh php-entry-dev.sh occ ncconf.json /usr/local/bin/
 COPY ncup /usr/local/ncup/
 COPY config.php dbcheck.php dbcheckenv.php /usr/local/
-COPY httpd-nc.conf cis.conf /etc/apache2/conf.d/
+COPY https_auto.conf remoteip.conf httpd-nc.conf cis.conf /etc/apache2/conf.d/
 COPY limitexcept /root/
 RUN set -ex; \
 #   chmod +r /etc/php7/conf.d/nc_apcu.ini /etc/php7/conf.d/nc_opccache.ini; \
@@ -230,6 +230,7 @@ ENV DOMAIN=localhost \
     SET_PROXY="NO" \
     TRUSTED_PROXY="" \
     ADD_MIS_COL="YES" \
+    REM_INT_PROX_IP="172.16.0.0/12" \
     #another step to get iconv working
     LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 HEALTHCHECK CMD /usr/local/bin/checkcontainer.sh

@@ -43,7 +43,7 @@ jobs:
       env: VERSION=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18 STG_PUSH=true
       script:
       - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
-      - systemctl restart docker
+      - sudo systemctl restart docker
       - export DOCKER_CLI_EXPERIMENTAL=enabled
       - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
       - docker --version

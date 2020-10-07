@@ -6,7 +6,7 @@ addons:
     sources:
       - sourceline: 'deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable'
     packages:
-    - docker
+    - docker-ce
 jobs:
   include:
     - stage: build_test_dev

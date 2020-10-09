@@ -1,28 +1,58 @@
 os: linux
 language: generic
-dist: bionic
+dist: focal
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable'
+    packages:
+    - docker-ce
 jobs:
   include:
-    - &build_and_test
-      stage: Build_and_test
-      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18 STG_PUSH=true
+    - stage: build_test_dev
+      if: branch = master
+      env: VERSION=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18
       script:
-      - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
-      - export DOCKER_CLI_EXPERIMENTAL=enabled
-      - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
-      # Upgrade to Docker CE 19.03 for BuildKit support
-      - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-      - sudo apt-get update
-      - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-      - docker buildx create --name builder --use
-      - docker buildx ls
-      - sudo apt-get install -y pwgen
       - docker --version
       - docker-compose --version
-      - export NC_PASS_CI=`pwgen -s -N1 20`
-      - export DB_PASS_CI=`pwgen -s -N1 20`
-      - export MYSQL_ROOT_PASSWORD_CI=`pwgen -s -N1 20`
+      - export NC_PASS_CI=`openssl rand -base64 16`
+      - export DB_PASS_CI=`openssl rand -base64 16`
+      - export MYSQL_ROOT_PASSWORD_CI=`openssl rand -base64 16`
+      - docker-compose -f ./nc/docker-compose.dev.yml build --build-arg NC_VER=${VERSION}
+      - docker-compose -f ./nc/docker-compose.dev.yml up -d
+      - |
+        SUT_HEALTH="notok" && counter=0
+        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 120 ]; do
+        SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
+        sleep 2
+        counter=$(( $counter + 1 ))
+        echo $counter
+        if [ $counter -eq 120 ]; then
+        echo $counter
+        docker logs nc_sut_1
+        exit 1
+        fi
+        done
+      - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
+      - docker logs nc_sut_1
+      - echo "$DOCKER_HUB_P" | docker login --username "$DOCKER_HUB_U" --password-stdin
+      - bash dockpush-dev.sh 
+    - &build_and_test
+      stage: Build_and_test
+      if: tag IS present
+      env: VERSION=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18 STG_PUSH=true
+      script:
+      - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+      - sudo systemctl restart docker
+      - export DOCKER_CLI_EXPERIMENTAL=enabled
+      - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+      - docker --version
+      - docker buildx create --name builder --use
+      - docker buildx ls
+      - docker-compose --version
+      - export NC_PASS_CI=`openssl rand -base64 16`
+      - export DB_PASS_CI=`openssl rand -base64 16`
+      - export MYSQL_ROOT_PASSWORD_CI=`openssl rand -base64 16`
       - docker pull tob123/nextcloud:${VERSION_PREV}
       - docker-compose -f ./nc/docker-compose.upg.yml up -d
       - echo "$DOCKER_HUB_P" | docker login --username "$DOCKER_HUB_U" --password-stdin
@@ -31,12 +61,12 @@ jobs:
       - docker inspect --format="{{json .State.Health.Status}}" nc_sut_1
       - |
         SUT_HEALTH="notok" && counter=0
-        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 60 ]; do
+        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 120 ]; do
         SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
         sleep 2
         counter=$(( $counter + 1 ))
         echo $counter
-        if [ $counter -eq 60 ]; then
+        if [ $counter -eq 120 ]; then
         echo $counter
         docker logs nc_sut_1
         exit 1
@@ -48,12 +78,12 @@ jobs:
       - docker-compose -f ./nc/docker-compose.test.yml up -d
       - |
         SUT_HEALTH="notok" && counter=0
-        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 60 ]; do
+        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 120 ]; do
         SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
         sleep 2
         counter=$(( $counter + 1 ))
         echo $counter
-        if [ $counter -eq 60 ]; then
+        if [ $counter -eq 120 ]; then
         echo $counter
         docker logs nc_sut_1
         exit 1
@@ -63,12 +93,12 @@ jobs:
       - docker-compose -f ./nc/docker-compose.test.yml up -d
       - |
         SUT_HEALTH="notok" && counter=0
-        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 60 ]; do
+        while [ $SUT_HEALTH != "healthy" ] && [ $counter -le 120 ]; do
         SUT_HEALTH=$(docker inspect --format="{{json .State.Health.Status}}" nc_sut_1 | tr -d '"')
         sleep 2
         counter=$(( $counter + 1 ))
         echo $counter
-        if [ $counter -eq 60 ]; then
+        if [ $counter -eq 120 ]; then
         echo $counter
         docker logs nc_sut_1
         exit 1
@@ -77,24 +107,31 @@ jobs:
       - docker container ls
       - docker image ls    
     - <<: *build_and_test
-      env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=19.0.3 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
-      env: VERSION=19.0.0 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=19.0.3 VERSION_MAJOR=19 VERSION_PREV=19.0.2 LATEST=true DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb STG_PUSH=true
+      env: VERSION=19.0.3 VERSION_MAJOR=19 VERSION_PREV=18 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
+      env: VERSION=19.0.3 VERSION_MAJOR=19 VERSION_PREV=19.0.2 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=19.0.3 VERSION_MAJOR=19 VERSION_PREV=19.0.2 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb STG_PUSH=true
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=18.0.8 DB_TYPE_CI=sqlite DB_IMAGE_CI=mariadb
     - <<: *build_and_test
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=18.0.4 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+      env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+    - <<: *build_and_test
+      env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=18.0.8 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+    - <<: *build_and_test
+      env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
+    - <<: *build_and_test
+      env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=18.0.8 DB_TYPE_CI=pgsql DB_IMAGE_CI=postgres
     - &vultest_deploy
       stage: Vulnerabilitytest and Deploy
-      env: VERSION=19.0.0 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      if: tag IS present
+      env: VERSION=19.0.3 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
       script:
       - sudo apt-get install -y python3-setuptools python3-pip
       - pip3 install --user anchorecli
@@ -102,8 +139,21 @@ jobs:
       - anchore-cli image add docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli image wait docker.io/tob123/nextcloud-staging:${VERSION}
       - anchore-cli evaluate check docker.io/tob123/nextcloud-staging:${VERSION}
+      - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+      - export DOCKER_CLI_EXPERIMENTAL=enabled
+      - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+      # Upgrade to Docker CE 19.03 for BuildKit support
+      - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      - sudo apt-get update
+      - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+      - docker buildx create --name builder --use
+      - docker buildx ls
+      - docker --version
+      - docker-compose --version
+      - echo "$DOCKER_HUB_P" | docker login --username "$DOCKER_HUB_U" --password-stdin
       deploy:
         provider: script
         script: bash dockcompare.sh
     - <<: *vultest_deploy
-      env: VERSION=18.0.5 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+      env: VERSION=18.0.9 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

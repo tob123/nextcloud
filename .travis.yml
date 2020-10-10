@@ -12,7 +12,7 @@ jobs:
     - stage: build_test_dev
       if: branch = master
       env: 
-      - VERSION=19.0.4 VERSION_MAJOR=19 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=18
+      - VERSION=20.0.0 VERSION_MAJOR=20 LATEST=true DB_TYPE_CI=sqlite DB_IMAGE_CI=postgres VERSION_PREV=19
       script:
       - docker --version
       - docker-compose --version

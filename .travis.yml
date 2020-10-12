@@ -181,4 +181,6 @@ jobs:
     - <<: *vultest_deploy
       env: 
       - VERSION=18.0.10 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
+    - <<: *vultest_deploy
+      env: 
       - VERSION=20.0.0 VERSION_MAJOR=20 VERSION_PREV=19 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

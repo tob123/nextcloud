@@ -113,9 +113,6 @@ jobs:
       - VERSION=19.0.4 VERSION_MAJOR=19 VERSION_PREV=19.0.3 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
       env: 
-      - VERSION=18.0.10 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb STG_PUSH=true
-    - <<: *build_and_test
-      env: 
       - VERSION=18.0.10 VERSION_MAJOR=18 VERSION_PREV=18.0.9 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
       env: 

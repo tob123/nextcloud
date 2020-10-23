@@ -145,6 +145,9 @@ jobs:
       deploy:
         provider: script
         script: bash dockcompare.sh
+        on:
+          tags: true
+          all_branches: true
     - <<: *vultest_deploy
       env: 
       - VERSION=18.0.10 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb

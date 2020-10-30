@@ -12,7 +12,7 @@ jobs:
     - stage: build_test_dev
       if: branch = master
       env: 
-      - VERSION=20.0.0 VERSION_MAJOR=20 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb VERSION_PREV=19
+      - VERSION=20.0.1 VERSION_MAJOR=20 LATEST=true DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb VERSION_PREV=19
       script:
       - docker --version
       - docker-compose --version
@@ -110,13 +110,16 @@ jobs:
       - docker image ls    
     - <<: *build_and_test
       env: 
+      - VERSION=20.0.1 VERSION_MAJOR=20 VERSION_PREV=20.0.0 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb LATEST=true STG_PUSH=true
+    - <<: *build_and_test
+      env: 
       - VERSION=19.0.4 VERSION_MAJOR=19 VERSION_PREV=19.0.3 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *build_and_test
       env: 
       - VERSION=18.0.10 VERSION_MAJOR=18 VERSION_PREV=18.0.9 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb STG_PUSH=true
     - <<: *build_and_test
       env: 
-      - VERSION=20.0.0 VERSION_MAJOR=20 VERSION_PREV=19 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb LATEST=true STG_PUSH=true
+      - VERSION=20.0.1 VERSION_MAJOR=20 VERSION_PREV=19 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb LATEST=true
     - &vultest_deploy
       stage: Vulnerabilitytest and Deploy
       if: tag IS present
@@ -153,4 +156,4 @@ jobs:
       - VERSION=18.0.10 VERSION_MAJOR=18 VERSION_PREV=17 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb
     - <<: *vultest_deploy
       env: 
-      - VERSION=20.0.0 VERSION_MAJOR=20 VERSION_PREV=19 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb LATEST=true
+      - VERSION=20.0.1 VERSION_MAJOR=20 VERSION_PREV=19 DB_TYPE_CI=mysql DB_IMAGE_CI=mariadb LATEST=true
